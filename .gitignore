@@ -1,0 +1,18 @@
+# 忽略所有子目录
+CGED/
+TSED/
+case_results/
+datasets/
+datasets_old/
+similarity_results/
+__pycache__/
+
+# 忽略特定文件类型
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+__pycache__/
+.pytest_cache/
+.coverage
+.env
