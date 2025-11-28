@@ -1,0 +1,25 @@
+{
+    "task":"get_pos_pairs_similarity",
+    "num_pairs_per_case":10,
+    "seed":42,
+    "results":[
+        {
+            "case":"",
+            "src":{
+                "code":"",
+                "language":""
+            },
+            "dst":{
+                "code":"",
+                "language":""
+            },
+            "similarity":{
+                "bleu":0.0,
+                "jaccard":0.0,
+                "tsed":0.0,
+                "cged":0.0
+            }
+        },
+        {}
+    ]
+}
