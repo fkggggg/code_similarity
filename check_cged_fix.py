@@ -21,15 +21,12 @@ def calculate_cged(src: str, dst: str, language: str = "python") -> float:
         cged_score = CGED(
             code_src_dst_list=[(src, dst)],
             language_src_dst_list=[(language, language)],
-            src_main_func_names=None,
-            dst_main_func_names=None,
-            src_update_cache=True,
-            dst_update_cache=False,
+            src_update_long_term_cache=True,
+            dst_update_long_term_cache=False,
+            pdg_parallelism = 10,
             nx_parallelism=60,
-            nx_budget=20,
-            use_tmp_cache=False,  # 设置为False以确保验证准确性
-            pdg_parallelism=10,
-            verbose_level=2,   # 设置为2debug
+            nx_budget=30,
+            verbose_level=2,   # set to 2 when debugging
         )
         
         # 获取返回的第一个相似度值
@@ -156,12 +153,12 @@ def recalculate_bad_cases(bad_case_file: str, output_file: str, default_language
 
 def main():
     # 定义文件路径
-    base_url = '/data/lyy/code_similarity/similarity_results/20251128_132006'
-    results_file = os.path.join(base_url, 'pos_pairs_similarity_results.json')
+    base_url = '/data/lyy/code_similarity/similarity_results/20251128_181816'
+    results_file = os.path.join(base_url, 'pos_neg_pairs_similarity_results.json')
     bad_case_file = os.path.join(base_url, 'bad_case.json')
     fixed_result_file = os.path.join(base_url, 'bad_case_fix.json')
     
-    need_fix = False 
+    need_fix = False
     
     print("=== 开始检查CGED修复情况 ===")
     

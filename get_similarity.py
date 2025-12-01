@@ -10,6 +10,9 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from TSED.TSED import Calculate as TSED
 from CGED import BatchCalculate as CGED
 from codebleu import calc_codebleu
+import concurrent.futures
+from functools import partial
+import multiprocessing
 
 # 从参考文件复制的分词和相似度计算函数
 def tokenize_code(code_string):
@@ -187,13 +190,56 @@ def calculate_all_similarities(code1, code2, language='python'):
         'codebleu': codebleu_score
     }
 
-def batch_calculate_similarities(code_pairs, language='python'):
+def _calculate_tsed_single(args):
     """
-    批量计算代码对的相似度，利用CGED的批处理能力
+    计算单个TSED相似度的辅助函数
+    
+    参数:
+        args (tuple): (index, language, code1, code2)
+    
+    返回:
+        tuple: (index, tsed_score)
+    """
+    index, language, code1, code2 = args
+    try:
+        # 重新导入模块以确保在子进程中可用
+        from TSED.TSED import Calculate as TSED
+        tsed_score = TSED(language, code1, code2, 1.0, 0.8, 1.0)
+        return index, tsed_score
+    except Exception as e:
+        print(f"TSED计算出错（对{index}）: {e}")
+        return index, 0.0
+
+def _calculate_codebleu_single(args):
+    """
+    计算单个CodeBLEU相似度的辅助函数
+    
+    参数:
+        args (tuple): (index, language, code1, code2)
+    
+    返回:
+        tuple: (index, codebleu_score)
+    """
+    index, language, code1, code2 = args
+    try:
+        # 重新导入模块以确保在子进程中可用
+        from codebleu import calc_codebleu
+        codebleu_result = calc_codebleu([code2], [code1], lang=language)
+        return index, codebleu_result['codebleu']
+    except Exception as e:
+        print(f"CodeBLEU计算出错（对{index}）: {e}")
+        return index, 0.0
+
+def batch_calculate_similarities(code_pairs, language='python', num_processes=40, cged_params=None):
+    """
+    批量计算代码对的相似度，利用CGED的批处理能力，并行化TSED和CodeBLEU计算
+    使用进程池替代线程池以获得更好的性能，特别是在CPU密集型任务上
     
     参数:
         code_pairs (list): 代码对列表，每个元素是(code1, code2)元组
         language (str): 代码语言
+        num_processes (int): 并行处理进程数
+        cged_params (dict): CGED参数配置
     
     返回:
         list: 包含每个代码对相似度字典的列表
@@ -212,17 +258,31 @@ def batch_calculate_similarities(code_pairs, language='python'):
             'codebleu': 0.0  # 将在后面填充
         })
     
+    # 默认CGED参数
+    default_cged_params = {
+        'src_update_long_term_cache': True,
+        'dst_update_long_term_cache': False,
+        'pdg_parallelism': 10,
+        'nx_parallelism': 60,
+        'nx_budget': 20,
+        'verbose_level': 0
+    }
+    
+    # 如果提供了自定义参数，则合并默认参数和自定义参数
+    if cged_params:
+        default_cged_params.update(cged_params)
+    
     # 批量计算CGED相似度
     try:
         cged_scores = CGED(
             code_src_dst_list=code_pairs,  # 直接传递所有代码对
             language_src_dst_list=[(language, language)] * len(code_pairs),
-            src_update_long_term_cache=True,
-            dst_update_long_term_cache=False,
-            pdg_parallelism = 10,
-            nx_parallelism=60,
-            nx_budget=20,
-            verbose_level=0,   # set to 2 when debugging
+            src_update_long_term_cache=default_cged_params['src_update_long_term_cache'],
+            dst_update_long_term_cache=default_cged_params['dst_update_long_term_cache'],
+            pdg_parallelism=default_cged_params['pdg_parallelism'],
+            nx_parallelism=default_cged_params['nx_parallelism'],
+            nx_budget=default_cged_params['nx_budget'],
+            verbose_level=default_cged_params['verbose_level'],
         )
         
         # 填充CGED分数
@@ -232,25 +292,29 @@ def batch_calculate_similarities(code_pairs, language='python'):
     except Exception as e:
         print(f"批量CGED计算出错: {e}")
     
-    # 批量计算TSED相似度（目前TSED不支持批量，仍需逐个计算）
-    for i, (code1, code2) in enumerate(code_pairs):
-        try:
-            tsed_score = TSED(language, code1, code2, 1.0, 0.8, 1.0)
-            results[i]['tsed'] = tsed_score
-        except Exception as e:
-            print(f"TSED计算出错（对{i}）: {e}")
+    # 并行计算TSED相似度
+    tsed_args = [(i, language, code1, code2) for i, (code1, code2) in enumerate(code_pairs)]
     
-    # 批量计算CodeBLEU相似度（需要逐个计算）
-    for i, (code1, code2) in enumerate(code_pairs):
-        try:
-            codebleu_result = calc_codebleu([code2], [code1], lang=language)
-            results[i]['codebleu'] = codebleu_result['codebleu']
-        except Exception as e:
-            print(f"CodeBLEU计算出错（对{i}）: {e}")
+    with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as executor:
+        tsed_futures = [executor.submit(_calculate_tsed_single, args) for args in tsed_args]
+        for future in concurrent.futures.as_completed(tsed_futures):
+            index, tsed_score = future.result()
+            if index < len(results):
+                results[index]['tsed'] = tsed_score
+    
+    # 并行计算CodeBLEU相似度
+    codebleu_args = [(i, language, code1, code2) for i, (code1, code2) in enumerate(code_pairs)]
+    
+    with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as executor:
+        codebleu_futures = [executor.submit(_calculate_codebleu_single, args) for args in codebleu_args]
+        for future in concurrent.futures.as_completed(codebleu_futures):
+            index, codebleu_score = future.result()
+            if index < len(results):
+                results[index]['codebleu'] = codebleu_score
     
     return results
 
-def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output_json=None):
+def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output_json=None, num_processes=40):
     """
     处理数据集，计算每个case中correct_submission之间的相似度均值，并支持生成JSON输出
     
@@ -360,7 +424,9 @@ def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output
                 # 使用批处理计算相似度
                 print(f"  开始批量计算代码对相似度...")
                 try:
-                    all_similarities = batch_calculate_similarities(pairs, language)
+                    # 获取CGED参数
+                    cged_params = getattr(batch_calculate_similarities, 'cged_params', None)
+                    all_similarities = batch_calculate_similarities(pairs, language, num_processes=num_processes, cged_params=cged_params)
                     
                     # 累加相似度并构建JSON结果
                     for i, (pair, similarities) in enumerate(zip(pairs, all_similarities)):
@@ -396,6 +462,7 @@ def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output
                         print(f"    Jaccard: {case_similarities['jaccard']:.4f}")
                         print(f"    TSED: {case_similarities['tsed']:.4f}")
                         print(f"    CGED: {case_similarities['cged']:.4f}")
+                        print(f"    CodeBLEU: {case_similarities['codebleu']:.4f}")
                         
                         # 累加到总相似度
                         for key in total_similarities:
@@ -483,6 +550,7 @@ def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output
             print(f"Jaccard均值: {overall_similarities['jaccard']:.4f}")
             print(f"TSED均值: {overall_similarities['tsed']:.4f}")
             print(f"CGED均值: {overall_similarities['cged']:.4f}")
+            print(f"CodeBLEU均值: {overall_similarities['codebleu']:.4f}")
         else:
             print("没有找到有效的case")
         
@@ -668,7 +736,9 @@ def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, 
                     continue
                 
                 # 计算样本对相似度
-                similarity_results = batch_calculate_similarities(pos_neg_pairs, language)
+                # 获取CGED参数
+                cged_params = getattr(batch_calculate_similarities, 'cged_params', None)
+                similarity_results = batch_calculate_similarities(pos_neg_pairs, language, cged_params=cged_params)
                 
                 # 构建当前case的JSON结果
                 for i, ((positive_code, negative_code), similarities) in enumerate(zip(pos_neg_pairs, similarity_results)):
@@ -821,30 +891,39 @@ def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, 
         return None
 
 def main():
-    # 设置全局随机种子，确保所有随机操作可复现
     random_seed = 42
     random.seed(random_seed)
-    print(f"设置全局随机种子: {random_seed}")
     
-    # 创建时间戳文件夹
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = f"/data/lyy/code_similarity/similarity_results/{timestamp}"
     os.makedirs(output_dir, exist_ok=True)
-    print(f"创建时间戳文件夹: {output_dir}")
     
     json_file_path = "/data/lyy/code_similarity/datasets_old/dataset_test_py3_subset.json"
     print(f"开始处理文件: {json_file_path}")
     # 每个case要抽取的样本对数量
     num_pairs_per_case = 10
+    # 最大进程数，默认使用80%的CPU核心数
+    num_processes = int(max(multiprocessing.cpu_count() * 0.8, 40))
+    # CGED参数
+    cged_params = {
+        'src_update_long_term_cache': True,
+        'dst_update_long_term_cache': False,
+        'pdg_parallelism': 10,
+        'nx_parallelism': 60,
+        'nx_budget': 20,
+        'verbose_level': 0
+    }
+    
+    batch_calculate_similarities.cged_params = cged_params
     
     # 指定输出JSON文件路径
     output_json_path = f"{output_dir}/pos_pairs_similarity_results.json"
     
     # 运行正样本对相似度计算
-    results = get_pos_pairs_similarity(json_file_path, num_pairs_per_case, random_seed, output_json=output_json_path)
+    results = get_pos_pairs_similarity(json_file_path, num_pairs_per_case, random_seed, output_json=output_json_path, num_processes=num_processes)
 
     output_json_path2 = f"{output_dir}/pos_neg_pairs_similarity_results.json"
-    results = get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case, random_seed, output_json=output_json_path2)
+    results = get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case, random_seed, output_json=output_json_path2, num_processes=num_processes)
     
     if results:
         print("\n相似度计算完成！")

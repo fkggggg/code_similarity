@@ -18,15 +18,15 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='计算并绘制ROC-AUC曲线')
     parser.add_argument('--pos_file', 
                         type=str, 
-                        default='/data/lyy/code_similarity/similarity_results/20251128_132006/pos_pairs_similarity_results.json',
+                        default='/data/lyy/code_similarity/similarity_results/pos_pairs_similarity_results_old.json',
                         help='正样本对结果JSON文件路径')
     parser.add_argument('--pos_neg_file', 
                         type=str, 
-                        default='/data/lyy/code_similarity/similarity_results/20251128_132006/pos_neg_pairs_similarity_results.json',
+                        default='/data/lyy/code_similarity/similarity_results/pos_neg_pairs_similarity_results_old.json',
                         help='负样本对结果JSON文件路径')
     parser.add_argument('--output_dir', 
                         type=str, 
-                        default='/data/lyy/code_similarity/similarity_results/roc_results',
+                        default='/data/lyy/code_similarity/roc_results',
                         help='结果输出目录')
     parser.add_argument('--plot_file', 
                         type=str, 

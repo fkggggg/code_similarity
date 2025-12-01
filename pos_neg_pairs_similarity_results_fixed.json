@@ -1,0 +1,2010 @@
+{
+  "task": "get_pos_neg_pairs_similarity",
+  "num_pairs_per_case": 10,
+  "seed": 42,
+  "results": [
+    {
+      "case": "p03326",
+      "src": {
+        "code": "n,m = (int(i) for i in input().split())\nc = [[int(i) for i in input().split()] for i in range(n)]\nans = 0\nfor i in range(8,16):\n\td = []\n\tfor j in range(n):\n\t\tnum = 0\n\t\tfor k in range(3):\n\t\t\tif bin(i)[3+k]==\"0\": num+=c[j][k]\n\t\t\telse: num-=c[j][k]\n\t\td.append(num)\n\td = sorted(d)[::-1]\n\tans = max(ans,sum(d[:m]))\nprint(ans)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "from itertools import product\n\nimport numpy as np\n\n\nn, m = list(map(int, input().split(\" \")))\nxyz_list = []\n\nfor _ in range(n):\n    xyz_list.append(np.array(list(map(int, input().split(\" \")))))\n\narrs = [np.array(x) for x in product([1, -1], repeat=3)]\n\n\nans = max([sum(sorted([sum(arr * xyz) for xyz in xyz_list])[-m:]) for arr in arrs])\nprint(ans)\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.24999582861533606,
+        "jaccard": 0.44642857142857145,
+        "tsed": 0.22027027027027052,
+        "cged": 0.5954692556634305,
+        "codebleu": 0.18459144631679658
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 0
+    },
+    {
+      "case": "p03326",
+      "src": {
+        "code": "n,m=map(int,input().split())\na=[list(map(int,input().split())) for i in range(n)]\nans=[]\nfor i in range(8):\n  binstr=format(i,\"b\").zfill(3)\n  b=[]\n  for j in range(n):\n    c=0\n    for k in range(3):\n      if binstr[k]==\"1\":\n        c+=a[j][k]\n      else:\n        c+=-a[j][k]\n    b.append(c)\n  b.sort(reverse=True)\n  ans.append(sum(b[:m]))\nprint(max(ans))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "#!/usr/bin/env python3\n# -*- coding: utf-8 -*-\n\nimport array\nfrom bisect import *\nfrom collections import *\nimport fractions\nimport heapq \nfrom itertools import *\nimport math\nimport random\nimport re\nimport string\nimport sys\n\nN, M = map(int, input().split())\nXYZs = []\nfor n in range(N):\n    x, y, z = map(int, input().split())\n    XYZs.append((x,y,z))\n\nans = 0\nfor i in (1,-1):\n    for j in (1,-1):\n        for k in (1,-1):\n            scores = []\n            for x, y, z in XYZs:\n                val = x * i + y * j + z * k\n                if val > 0:\n                    scores.append(val)\n            scores.sort()\n            scores.reverse()\n            ans = max(ans, sum(scores[:M]))\nprint(ans)\n\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.22810146558887945,
+        "jaccard": 0.4266666666666667,
+        "tsed": 0.34301075268817277,
+        "cged": 0.5611940298507463,
+        "codebleu": 0.20696050200736568
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 1
+    },
+    {
+      "case": "p03326",
+      "src": {
+        "code": "from itertools import product\nn ,m = map(int,input().split())\ncake = [list(map(int,input().split())) for i in range(n)]\n\nans = 0;\nfor x, y,z in product([1,-1], repeat = 3):\n    tmp = []\n    for a,b,c in cake:\n        tmp.append(a * x + b * y + c * z)\n    tmp.sort(reverse= True)\n    ans = max(ans,sum(tmp[:m]))\nprint(ans)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import numpy as np\nn, m = map(int, input().split())\nv = [list(map(int, input().split())) for i in range(n)]\nans = 0\nop = [-1,1]\nfor i in range(2):\n    for j in range(2):\n        for k in range(2):\n            sx, sy, sz = op[i], op[j], op[k]\n            dp = np.zeros(m+1, dtype=np.float64)\n            for x, y, z in v:\n                x *= sx\n                y *= sy\n                z *= sz\n                dp[1:] = np.maximum(dp[1:], dp[:-1]+x+y+z)\n            ans = max(ans, dp[-1])\nprint(int(ans))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.3265243027480981,
+        "jaccard": 0.49206349206349204,
+        "tsed": 0.5482758620689658,
+        "cged": 0.6006389776357828,
+        "codebleu": 0.2722583566105403
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 2
+    },
+    {
+      "case": "p03326",
+      "src": {
+        "code": "N, M = map(int, input().split())\n\na = [0] * N\nA = []\n\nfor i in range(N):\n    a[i] = [int(k) for k in input().split()]\n\nans = 0\nfor x in (1, -1):\n    for y in (1, -1):\n        for z in (1, -1):\n            total = [x * a[k][0] + y * a[k][1] + z * a[k][2] for k in range(N)]\n            total.sort(reverse=True)\n            ans = max(ans, sum(total[:M]))\n\nprint(ans)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n,m=map(int,input().split())\nif n%2:\n    print(\"test\")\nl000=[]\nl001=[]\nl010=[]\nl100=[]\nfor i in range(n):\n    x,y,z=map(int,input().split())\n    l000.append((x+y+z,x,y,z))\n    l001.append((x+y-z,x,y,z))\n    l010.append((x-y+z,x,y,z))\n    l100.append((-x+y+z,x,y,z))\nl000.sort()\nl001.sort()\nl010.sort()\nl100.sort()\ndx=[0]*8\ndy=[0]*8\ndz=[0]*8\nfor i in range(m):\n    dx[0]+=l000[i][1]\n    dy[0]+=l000[i][2]\n    dz[0]+=l000[i][3]\n    dx[1]+=l000[-i-1][1]\n    dy[1]+=l000[-i-1][2]\n    dz[1]+=l000[-i-1][3]\n    dx[2]+=l001[i][1]\n    dy[2]+=l001[i][2]\n    dz[2]+=l001[i][3]\n    dx[3]+=l001[-i-1][1]\n    dy[3]+=l001[-i-1][2]\n    dz[3]+=l001[-i-1][3]\n    dx[4]+=l010[i][1]\n    dy[4]+=l010[i][2]\n    dz[4]+=l010[i][3]\n    dx[5]+=l010[-i-1][1]\n    dy[5]+=l010[-i-1][2]\n    dz[5]+=l010[-i-1][3]\n    dx[6]+=l100[i][1]\n    dy[6]+=l100[i][2]\n    dz[6]+=l100[i][3]\n    dx[7]+=l100[-i-1][1]\n    dy[7]+=l100[-i-1][2]\n    dz[7]+=l100[-i-1][3]\nans=abs(dx[-1])+abs(dy[-1])+abs(dz[-1])\nfor i in range(7):\n    ans=max(ans,abs(dx[i])+abs(dy[i])+abs(dz[i]))\nprint(ans)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.021367167737122,
+        "jaccard": 0.5,
+        "tsed": 0.32366412213740225,
+        "cged": 0.37385321100917435,
+        "codebleu": 0.1155975421120754
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 3
+    },
+    {
+      "case": "p03326",
+      "src": {
+        "code": "from itertools import product\nfrom operator import mul\n\nSGN = (-1, 1)\n\nN, M = map(int, input().split())\n\ne = [list(map(int, input().split())) for _ in range(N)]\n\nans = -1\nfor sgns in product(SGN, repeat=3):\n    t = [sum(map(mul, ee, sgns)) for ee in e]\n    ans = max(ans, sum(sorted(t, reverse=True)[:M]))\nprint(ans)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "N,M=map(int,input().split())\ncakes=[]\nfor i in range(N):\n  x,y,z=map(int,input().split())\n  cakes.append([x,y,z])\nscore=[0]*8\nscore[0]=sum(sorted(map(lambda c: c[0]+c[1]+c[2], cakes))[-M:])\nscore[1]=sum(sorted(map(lambda c: c[0]+c[1]-c[2], cakes))[-M:])\nscore[2]=sum(sorted(map(lambda c: c[0]-c[1]+c[2], cakes))[-M:])\nscore[3]=sum(sorted(map(lambda c: c[0]-c[1]-c[2], cakes))[-M:])\nscore[4]=sum(sorted(map(lambda c:-c[0]+c[1]+c[2], cakes))[-M:])\nscore[5]=sum(sorted(map(lambda c:-c[0]+c[1]-c[2], cakes))[-M:])\nscore[6]=sum(sorted(map(lambda c:-c[0]-c[1]+c[2], cakes))[-M:])\nscore[7]=sum(sorted(map(lambda c:-c[0]-c[1]-c[2], cakes))[-M:])\nprint(max(score))\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.04047258842284612,
+        "jaccard": 0.4067796610169492,
+        "tsed": 0.35266272189349107,
+        "cged": 0.49812734082397003,
+        "codebleu": 0.06413861993971909
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 4
+    },
+    {
+      "case": "p03326",
+      "src": {
+        "code": "from itertools import product\nn,m = map(int,input().split())\ncake = [list(map(int,input().split())) for i in range(n)]\n\nans = 0\nfor x,y,z in product([1,-1], repeat = 3):\n    tmp = []\n    for a,b,c in cake:\n        tmp.append(a * x + b * y + c * z)\n    tmp.sort(reverse= True)\n    ans = max(ans,sum(tmp[:m]))\nprint(ans)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import sys\nimport heapq, math\nfrom itertools import zip_longest, permutations, combinations, combinations_with_replacement\nfrom itertools import accumulate, dropwhile, takewhile, groupby\nfrom functools import lru_cache\nfrom copy import deepcopy\n\nN, M = map(int, input().split())\nX, Y, Z = [0] * N, [0] * N, [0] * N\n\nfor i in range(N):\n    X[i], Y[i], Z[i] = map(int, input().split())\n\ncodes = [[1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1], [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1]]\n\n\ndef calc(code, idx):\n    return code[0] * X[idx] + code[1] * Y[idx] + code[2] * Z[idx]\n\n\nans = 0\nINF = 1 << 60\nfor code in codes:\n    dp = [-INF] * (M + 1)\n    dp[0] = 0\n    for i in range(N):\n        tmp = [-INF] * (M + 1)\n        tmp[0] = 0\n        for j in range(M, 0, -1):\n            if dp[j - 1] >= 0:\n                tmp[j] = max(dp[j], dp[j - 1] + calc(code, i))\n\n        dp = tmp\n    #     print(\"\", dp)\n    # print(dp)\n    ans = max(ans, dp[M])\n\nprint(ans)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.0665919009727237,
+        "jaccard": 0.345679012345679,
+        "tsed": 0.3694352159468427,
+        "cged": 0.4472573839662447,
+        "codebleu": 0.15334620511813282
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 5
+    },
+    {
+      "case": "p03326",
+      "src": {
+        "code": "n, m = map(int, input().split())\nA = [[int(i) for i in input().split()] for i in range(n)]\nB = []\n\ndef f(x):\n    if x % 2 == 0:\n        return 1\n    else:\n        return -1\n    \nfor i in range(8):\n    temp = sorted([f(i//4) * A[j][0] + f(i//2) * A[j][1] + f(i) * A[j][2] for j in range(n)], reverse=True)\n    B.append(sum(temp[:m]))\n    \nprint(max(B))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n, m = map(int, input().split())\nxyz = [tuple(map(int, input().split())) for _ in range(n)]\nmaxc = None\n\ntmpc = 0\ni = 0\nfor c in sorted([x+y+z for x, y, z in xyz]):\n  tmpc += c\n  i += 1\n  if i == m:\n    break\nmaxc = tmpc\n\ntmpc = 0\ni = 0\nfor c in sorted([x+y-z for x, y, z in xyz]):\n  tmpc += c\n  i += 1\n  if i == m:\n    break\nmaxc = max(maxc, abs(tmpc))\n\ntmpc = 0\ni = 0\nfor c in sorted([x-y+z for x, y, z in xyz]):\n  tmpc += c\n  i += 1\n  if i == m:\n    break\nmaxc = max(maxc, abs(tmpc))\n\ntmpc = 0\ni = 0\nfor c in sorted([x-y-z for x, y, z in xyz]):\n  tmpc += c\n  i += 1\n  if i == m:\n    break\nmaxc = max(maxc, abs(tmpc))\n\ntmpc = 0\ni = 0\nfor c in sorted([-x+y+z for x, y, z in xyz]):\n  tmpc += c\n  i += 1\n  if i == m:\n    break\nmaxc = max(maxc, abs(tmpc))\n\ntmpc = 0\ni = 0\nfor c in sorted([-x+y-z for x, y, z in xyz]):\n  tmpc += c\n  i += 1\n  if i == m:\n    break\nmaxc = max(maxc, abs(tmpc))\n\ntmpc = 0\ni = 0\nfor c in sorted([-x-y+z for x, y, z in xyz]):\n  tmpc += c\n  i += 1\n  if i == m:\n    break\nmaxc = max(maxc, abs(tmpc))\n\ntmpc = 0\ni = 0\nfor c in sorted([-x-y-z for x, y, z in xyz]):\n  tmpc += c\n  i += 1\n  if i == m:\n    break\nmaxc = max(maxc, abs(tmpc))\n\nprint(maxc)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.033556707598752296,
+        "jaccard": 0.48214285714285715,
+        "tsed": 0.3309890109890094,
+        "cged": 0.3424270931326434,
+        "codebleu": 0.0665185858628858
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 6
+    },
+    {
+      "case": "p03326",
+      "src": {
+        "code": "N, M = map(int, input().split())\nl = [list(map(int, input().split())) for _ in range(N)]\n\na = 0\n\nfor xs in (1, -1):\n  for ys in (1, -1):\n    for zs in (1, -1):\n      l_s = [x*xs + y*ys + z*zs for x, y, z in l]\n      l_s.sort(reverse=True)\n      a = max(sum(l_s[:M]), a)\n\nprint(a)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "# 要素が3つあるかと思いきや評価方法はそれらの総和だけなので結局1つだけじゃんね\n# と思ったら問題を読み違えていた 合計値の絶対値なので最後までわからんということか 最後までやってると当然間に合わない これどうすんの 前回の計算結果も流用できないのでは\n# -> ぜんぶためす でした 死\n# \"8通り\"?????「基準が正方向と負方向の2つで、3つの要素のうち1つの基準が決まれば残りも決まる」から6通りじゃね??????????????\n\n\nn, m = map(int, input().split())\ndp = {}\nbeauties, yammies, favorities = [], [], []\nfor i in range(n):\n    b, y, f = map(int, input().split())\n    beauties.append([i, b])\n    yammies.append([i, y])\n    favorities.append([i, f])\n\n\ndef gen_indicies(base, reverse):\n    return list(\n        map(lambda x: x[0], sorted(base, key=lambda x: x[1], reverse=reverse)[:m])\n    )\n\n\ndef sum_by_indicies(arr, indicies):\n    ret = 0\n    for i in indices:\n        ret += arr[i][1]\n    return ret\n\n\nans = -(10 ** 10)\n# 綺麗さ降順\nindices = gen_indicies(beauties, True)\nb_tmp, y_tmp, f_tmp = (\n    sum_by_indicies(beauties, indices),\n    sum_by_indicies(yammies, indices),\n    sum_by_indicies(favorities, indices),\n)\nans = max(ans, abs(b_tmp) + abs(y_tmp) + abs(f_tmp))\n# 綺麗さ昇順\nindices = gen_indicies(beauties, False)\nb_tmp, y_tmp, f_tmp = (\n    sum_by_indicies(beauties, indices),\n    sum_by_indicies(yammies, indices),\n    sum_by_indicies(favorities, indices),\n)\nans = max(ans, abs(b_tmp) + abs(y_tmp) + abs(f_tmp))\n# 旨さ降順\nindices = gen_indicies(beauties, True)\nb_tmp, y_tmp, f_tmp = (\n    sum_by_indicies(beauties, indices),\n    sum_by_indicies(yammies, indices),\n    sum_by_indicies(favorities, indices),\n)\nans = max(ans, abs(b_tmp) + abs(y_tmp) + abs(f_tmp))\n# 旨さ昇順\nindices = gen_indicies(beauties, False)\nb_tmp, y_tmp, f_tmp = (\n    sum_by_indicies(beauties, indices),\n    sum_by_indicies(yammies, indices),\n    sum_by_indicies(favorities, indices),\n)\nans = max(ans, abs(b_tmp) + abs(y_tmp) + abs(f_tmp))\n# 人気さ降順\nindices = gen_indicies(favorities, True)\nb_tmp, y_tmp, f_tmp = (\n    sum_by_indicies(beauties, indices),\n    sum_by_indicies(yammies, indices),\n    sum_by_indicies(favorities, indices),\n)\nans = max(ans, abs(b_tmp) + abs(y_tmp) + abs(f_tmp))\n# 人気さ昇順\nindices = gen_indicies(beauties, False)\nb_tmp, y_tmp, f_tmp = (\n    sum_by_indicies(beauties, indices),\n    sum_by_indicies(yammies, indices),\n    sum_by_indicies(favorities, indices),\n)\nans = max(ans, abs(b_tmp) + abs(y_tmp) + abs(f_tmp))\nprint(ans)\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.010047903582979063,
+        "jaccard": 0.2967032967032967,
+        "tsed": 0.3008474576271161,
+        "cged": 0.3937677053824362,
+        "codebleu": 0.10574193851678819
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 7
+    },
+    {
+      "case": "p03326",
+      "src": {
+        "code": "n, m = map(int, input().split())\n\nr = [[0]*n for _ in range(8)]\nfor i in range(n):\n    x, y, z = map(int, input().split())\n    r[0][i] = x+y+z\n    r[1][i] = x+y-z\n    r[2][i] = x-y+z\n    r[3][i] = x-y-z\n    r[4][i] = -x+y+z\n    r[5][i] = -x+y-z\n    r[6][i] = -x-y+z\n    r[7][i] = -x-y-z\n\nprint(max(sum(sorted(r[i])[-m:]) for i in range(8)) if m != 0 else 0)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import itertools\nimport numpy as np\nn, m = map(int, input().split())\nc_list = []\nfor i in range(n):\n    c = list(map(int, input().split()))\n    c_list.append(c)\nc_arr = np.array(c_list)\ncom_list = list(itertools.combinations(range(n), m))\nmax_value = -10**12\nfor com in com_list:\n    value = np.array([0,0,0])\n    for c in com:\n        value = value + c_arr[c]\n    tmp = abs(value[0]) + abs(value[1]) + abs(value[2])\n    if max_value < tmp:\n        max_value = tmp\nprint(max_value)\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.23211859858267622,
+        "jaccard": 0.4126984126984127,
+        "tsed": 0.31505376344086067,
+        "cged": 0.4880382775119617,
+        "codebleu": 0.21213428358709424
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 8
+    },
+    {
+      "case": "p03326",
+      "src": {
+        "code": "import itertools\n\nn,m = map(int,input().split())\na = [list(map(int,input().split())) for _ in range(n)]\nb = list(itertools.product([1,-1],repeat=3))\n\nt = []\nfor i in range(len(b)):\n    c = []\n    for j in range(n):\n        total = a[j][0]*b[i][0] + a[j][1]*b[i][1] + a[j][2]*b[i][2]\n        c.append(total)\n    c.sort(reverse=True)\n    t.append(sum(c[:m]))\n\nprint(max(t))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import itertools\n \nN, M = map(int, input().strip().split())\ncakes = []\n \nfor _ in range(N):\n  cake = list(map(int, input().strip().split()))\n  cakes.append(abs(cake[0]) + abs(cake[1]) + abs(cake[2]))\n  \nprint(sum(list(sorted(cakes, key=lambda x: -x)))[:M])",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.2716346174298096,
+        "jaccard": 0.4909090909090909,
+        "tsed": 0.26543209876543217,
+        "cged": 0.545045045045045,
+        "codebleu": 0.23449109719590816
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 9
+    },
+    {
+      "case": "760_B",
+      "src": {
+        "code": "R = lambda: map(int, input().split())\nn, p, k = R()\nl, r = 1, p\nwhile l < r:\n    m = (l + r + 1) // 2\n    cl = (m + max(1, m - k + 1)) * min(k, m) // 2 + max(k - m, 0)\n    cr = (m + max(1, m - (n - k))) * min(n - k + 1, m) // 2 + max(n - k + 1 - m, 0)\n    if cl + cr - m <= p:\n        l = m\n    else:\n        r = m - 1\nprint(l)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "\nu = input().split()\ntakht = int(u[0])\nbalesht = int(u[1])\nkhodesh = int(u[2])\nif balesht % takht == 0:\n    c = int(balesht/takht) - 1\n    balesht = takht\nelse:\n    c = int(balesht/takht)\n    balesht = balesht - (takht * c)\na = khodesh\nb = khodesh\nwhile (balesht>0 and balesht>=a-b+1):\n    d = a-b+1\n    balesht -= d\n    c += 1\n    if (a+1<=takht):\n        a+=1;\n            \n    if (b-1>=1):\n        b-=1;\n            \nprint(c)\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.08766036094246232,
+        "jaccard": 0.4166666666666667,
+        "tsed": 0.3523809523809526,
+        "cged": 0.2936288088642659,
+        "codebleu": 0.17549658185797137
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 0
+    },
+    {
+      "case": "760_B",
+      "src": {
+        "code": "def calculate_need(x, l, r):\n    if l > x - 1:\n        tl = (x - 1) * x // 2 + l - x + 1\n    else:\n        tl = (x - 1 + x - l) * l // 2\n\n    if r > x - 1:\n        tr = (x - 1) * x // 2 + r - x + 1\n    else:\n        tr = (x - 1 + x - r) * r // 2\n\n    t = tl + tr + x\n    return t\n\n\ndef codeforces(n, m, k):\n    l = k - 1\n    r = n - k\n    min_num = 1\n    max_num = m\n    result = 0\n\n    while True:\n        num = (min_num + max_num) // 2\n        need = calculate_need(num, l, r)\n        if need == m or num == result:\n            return num\n        elif need > m:\n            max_num = num - 1\n        elif need < m:\n            result = num\n            min_num = num + 1\n\n\nn, m, k = map(int, input().split())\nprint(codeforces(n, m, k))\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "from math import *\nn,m,k=map(int,input().split())\nr,l=0,0\n\nr=n-k\nl=k-1\ns=max(l,r)+1\nif l>r:\n    S=((1+l)*(l)//2)+((s-1+s-r)*r//2)\nelse:\n    S=((1+r)*(r)//2)+((s-1+s-l)*l//2)\nS+=max(l,r)+1\nL,R=max(l,r),min(l,r)\ns1=s\ns2=1\nS1=n\nS2=S\nif S>m:\n    while S1!=S2:\n        S1=S2\n        s=(s1+s2)//2   \n        if R>s:\n            S2=((s+1)*s//2)+(L-s+1)+((s-1+s-R)*R//2)\n        else:\n            S2=((s+1)*s//2)+(L-s+1)+((s)*(s-1)//2)+(s-R)\n        \n        \n        if S2>m:\n            s1=s\n        elif S2<m:\n            s2=s\n        else:\n            break\n       \n  \nelse:\n    s+=(m-S)//n\nprint(s)\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.21232667941493816,
+        "jaccard": 0.4915254237288136,
+        "tsed": 0.37862068965517204,
+        "cged": 0.28389154704944175,
+        "codebleu": 0.15590939809171073
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 1
+    },
+    {
+      "case": "760_B",
+      "src": {
+        "code": "n, m, k = list(map(int, input().split()))\ndef cnt(n):\n\treturn n * (n + 1) // 2\ndef sum(l, r):\n\tif l > r:\n\t\treturn 0\n\td = 0\n\tif l <= 0:\n\t\td = abs(l) + 1\n\t\tl = 1\n\treturn cnt(r) - cnt(l - 1) + d\nrt = int(1e9) + 2\nlt = 1\n\nwhile rt - lt > 1:\n\tmid = (lt + rt) // 2\n\ttotal = sum(mid - k + 1, mid) + sum(mid - (n - k), mid - 1)\n\tif total <= m:\n\t\tlt = mid\n\telse:\n\t\trt = mid\nprint(lt)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "##a=list(map(int,input().split()))\n##a[1]=a[1]-((a[0]-1)*4)%7\n##if a[1]>5:\n##    print(6)\n##else:\n##    print(5)\na=list(map(int,input().split()))\nz=[1]*a[0]\nv=a[1]-a[0]\nx=a[2]-1\n##print(x)\ndef pedy(x):\n    global z,v\n##    print(x)\n    if x<len(z)-1 and x>0:\n        if z[x+1]<z[x]:\n            z[x+1]+=1\n            v=v-1\n        if v<0:\n            return 0\n        if z[x-1]<z[x]:\n            z[x-1]+=1\n            v=v-1\n    if v<0:\n            return 0\n    else:\n        if x>0:\n            if z[x-1]<z[x]:\n                z[x-1]+=1\n                v=v-1\n        if v<0:\n            return 0\n        if x<len(z)-1:\n            if z[x+1]<z[x]:\n                z[x+1]+=1\n                v=v-1\n                \n    for i in range(len(z)-1):\n        if z[i]>=z[i+1]:\n            if z[i]-z[i+1]>1:\n                pedy(i+1)\n        else:\n            if z[i+1]-z[i]>1:\n                pedy(i+1)\nwhile v>0:\n    z[x]+=1\n    v-=1\n    for i in range(len(z)-1):\n        if z[i]>=z[i+1]:\n            if z[i]-z[i+1]>1:\n                pedy(i+1)\n        else:\n            if z[i+1]-z[i]>1:\n                pedy(i+1)\n\nprint(z[x])\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.03047273022755421,
+        "jaccard": 0.4166666666666667,
+        "tsed": 0.36767123287671033,
+        "cged": 0.26825127334465193,
+        "codebleu": 0.1187014291982833
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 2
+    },
+    {
+      "case": "760_B",
+      "src": {
+        "code": "import io\nimport math\n\nn, m, k = map(int, input().split())\nresult = 1\nm -= n\nleft = k - 1\nright = n - k\npink = 1\nwhile (m >= pink):\n    m -= pink\n    result += 1\n    pink += (left > 0) + (right > 0)\n    if (left): left -= 1\n    if (right): right -= 1\n    if (left == right == 0):\n        result += (m // pink)\n        break\nprint(result)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "l = list(map(int, input().rstrip().split()))\nto = int(l[1])\nre = to % l[0]\nx = 0\nf = 0\ni = 1\nremain = to - l[0]\n\nif (l[2] == 1 or l[2] == l[0]):\n    to =to- l[0]\n    while (to> 0):\n        for j in range(i):\n            to = to - 1\n            if(to==0):\n                i-=1\n                break\n        i = i + 1\n    print(i)\n\nelse:\n    r = l[2] - l[0]\n    l = l[2] - 1\n    tr = 0\n    tl = 0\n    x = 1\n    while (to> 0):\n        to = to - tr - tl - 1\n        if tr != r:\n            tr = tr + 1\n        if tl != l:\n            tl = tl + 1\n        x = x + 1",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.1182463315942963,
+        "jaccard": 0.3584905660377358,
+        "tsed": 0.4380000000000008,
+        "cged": 0.3116883116883117,
+        "codebleu": 0.16696570542392813
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 3
+    },
+    {
+      "case": "760_B",
+      "src": {
+        "code": "n, m, k = tuple(int(_) for _ in input().split())\n\nextra_pillows = m - n\nmax_pillow = 1\n\nif n == 1:\n    print(m)\nelif n == 2:\n    if m % 2 == 0:\n        print(int(m / 2))\n    else:\n        print(int(m / 2) + 1)\nelse:\n    for i in range(extra_pillows):\n        step_pillows = 1 + min(k - 1, i) + min(n - k, i)\n        if extra_pillows >= step_pillows:\n            extra_pillows -= step_pillows\n            max_pillow += 1\n        else:\n            break\n\n    print(max_pillow)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n,m,k=map(int,input().split())\nif(m%n==0):\n    print(m//k)\nelse:\n    print((m//k)+1)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.19399398399478798,
+        "jaccard": 0.5555555555555556,
+        "tsed": 0.296124031007752,
+        "cged": 0.2826855123674912,
+        "codebleu": 0.2482660957041663
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 4
+    },
+    {
+      "case": "760_B",
+      "src": {
+        "code": "def main():\n    n, hi, k = map(int, input().split())\n    m, l, lo = (hi - n) * 2, n - k + 1, 0\n    while lo < hi - 1:\n        mid = (lo + hi) // 2\n        x = mid * mid * 2\n        if mid > k:\n            x -= (mid - k) * (mid - k + 1)\n        if mid > l:\n            x -= (mid - l) * (mid - l + 1)\n        if x > m:\n            hi = mid\n        else:\n            lo = mid\n    print(lo + 1)\n\n\nif __name__ == '__main__':\n    main()\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def just_sum(n):\n    return (n * (n + 1)) // 2\n\n\ndef get_sum(a, b):\n    return just_sum(b) - just_sum(a - 1)\n\n\ndef check(middle):\n    left = k - 1\n    right = n - k\n    \n    if left < m:\n        left_sum = get_sum(middle - left, middle - 1)\n    else:\n        left_sum = just_sum(middle - 1) + (left - (middle - 1))\n    \n    if right < m:\n        right_sum = get_sum(middle - right, middle - 1)\n    else:\n        right_sum = just_sum(middle - 1) + (right - (middle - 1))\n    \n    return left_sum + right_sum + middle <= m\n    \n    \nn, m, k = map(int, input().split())\n\nl = 1\nr = m + 1\nwhile l < r - 1:\n    middle = (l + r) // 2\n    if check(middle):\n        l = middle\n    else:\n        r = middle\n        \nprint(l)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.14406188481594015,
+        "jaccard": 0.5531914893617021,
+        "tsed": 0.35179487179487207,
+        "cged": 0.29453681710213775,
+        "codebleu": 0.1865016037291052
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 5
+    },
+    {
+      "case": "760_B",
+      "src": {
+        "code": "def just_sum(n):\n    return (n * (n + 1)) // 2\n\n\ndef get_sum(a, b):\n    return just_sum(b) - just_sum(a - 1)\n\n\ndef check(middle):\n    left = k - 1\n    right = n - k\n    \n    if left < middle:\n        left_sum = get_sum(middle - left, middle - 1)\n    else:\n        left_sum = just_sum(middle - 1) + (left - (middle - 1))\n    \n    if right < middle:\n        right_sum = get_sum(middle - right, middle - 1)\n    else:\n        right_sum = just_sum(middle - 1) + (right - (middle - 1))\n    \n    return left_sum + right_sum + middle <= m\n    \n    \nn, m, k = map(int, input().split())\n\nl = 1\nr = m + 1\nwhile l < r - 1:\n    middle = (l + r) // 2\n    if check(middle):\n        l = middle\n    else:\n        r = middle\n        \nprint(l)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "hobs, pillows, frodo = input().split()\nhobs, pillows, frodo = int(hobs), int(pillows), int(frodo)\nturn = -1\nleft = frodo\nright = frodo\npilCount = 1\npillows-=hobs\nwhile True:\n     turn+=1\n     if left<= 0 and right > hobs:\n          pilCount+=pillows//hobs\n          break\n     elif left <= 0 or right > hobs:\n          pillows-=(turn+1)\n     else:\n          pillows-=(turn*2+1)\n     left-=1\n     right+=1\n     if pillows < 0:\n          break\n     pilCount+=1\nprint(pilCount)\n\t \t\t \t\t\t\t   \t\t \t    \t  \t\t \t  \t",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.08761234828047226,
+        "jaccard": 0.44,
+        "tsed": 0.31794871794871826,
+        "cged": 0.20297029702970293,
+        "codebleu": 0.16783949409083246
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 6
+    },
+    {
+      "case": "760_B",
+      "src": {
+        "code": "#!/usr/bin/env python3\ndef ri():\n    return map(int, input().split())\nn, m, k = ri()\n\n\ndef area(h, n, k):\n    s = n\n    if k >= h-1:\n        s += h*(h-1)//2\n    else:\n        s += k*(k+1)//2 + k*(h-k-1)\n\n    if n-k >= h-1:\n        s += (h-1)*(h-2)//2\n    else:\n        s += (n-k-1)*(n-k)//2 + (n-k)*(h-n+k-1)\n    return s\n\nh1 = 1\nh2 = m\nhmax = 0\nhprev = 0\nwhile True:\n    hh = (h1+h2)//2\n    if hh == hprev:\n        break\n    hprev = hh\n    mm = area(hh, n, k)\n    # print(h1, h2, hmax, hh, mm, m)\n    if mm > m:\n        h2 = hh\n    else:\n        h1 = hh+1\n        hmax = max(hmax, hh)\n\nprint(hmax)\n\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n,m,k=map(int,input().split())\nl=0\nr=m\nwhile l<r:\n    med=(l+r+1)//2\n    if ((2*med-k+1)*k)//2+((2*med-1-n+k)*(n-k))//2>m:\n        r=med-1\n    else:\n        l=med\nprint(r)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.1891854262978179,
+        "jaccard": 0.5,
+        "tsed": 0.27417840375586855,
+        "cged": 0.2774869109947644,
+        "codebleu": 0.20590418569256325
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 7
+    },
+    {
+      "case": "760_B",
+      "src": {
+        "code": "\ndef check(n,m,k,x):\n    s = x\n    if x <= k: s += ((x-1)*x)//2\n    else: s += ((x-1)*x)//2-((x-k)*(x-k+1))//2\n    \n    if x-1<=n-k: s += ((x-1)*x)//2\n    else : s += ((x-1)*x)//2 - ((x-1-n+k)*(x-n+k))//2\n    \n    if s <= m: return True\n    return False\n\ndef main():\n    \n    n, m, k = map(int, input().split())\n    m -= n\n    l = 0\n    h = 1000*1000*1000\n    \n    while l <= h:\n        x = (l+h) // 2\n        if check(n,m,k,x): l = x+1\n        else: h = x-1\n    \n    print(l)\n\nif __name__ == '__main__':\n    main()",
+        "language": "python"
+      },
+      "dst": {
+        "code": "hobs, pillows, frodo = input().split()\nhobs, pillows, frodo = int(hobs), int(pillows), int(frodo)\nturn = 0\nleft = frodo\nright = frodo\npilCount = 1\npillows-=hobs\nwhile True:\n     if left<= 1 and right == hobs:\n          pilCount+=pillows//hobs\n          break\n     elif left <= 1 or right == hobs:\n          pillows-=(turn+1)\n     else:\n          pillows-=(turn*2+1)\n\n     if pillows < 0:\n          break\n     left-=1\n     right+=1\n     pilCount+=1\n     turn+=1\nprint(pilCount)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.06637435147757668,
+        "jaccard": 0.4489795918367347,
+        "tsed": 0.2375586854460095,
+        "cged": 0.23173803526448367,
+        "codebleu": 0.19251453780845745
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 8
+    },
+    {
+      "case": "760_B",
+      "src": {
+        "code": "n, m, k = list(map(int, input().split()))\ndef cnt(n):\n\treturn n * (n + 1) // 2\ndef sum(l, r):\n\tif l > r:\n\t\treturn 0\n\td = 0\n\tif l <= 0:\n\t\td = abs(l) + 1\n\t\tl = 1\n\treturn cnt(r) - cnt(l - 1) + d\nrt = int(1e9) + 2\nlt = 1\n\nwhile rt - lt > 1:\n\tmid = (lt + rt) // 2\n\ttotal = sum(mid - k + 1, mid) + sum(mid - (n - k), mid - 1)\n\tif total <= m:\n\t\tlt = mid\n\telse:\n\t\trt = mid\nprint(lt)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "\n# x is the number of pillows Frodo wants\n\ndef is_ok(x, y):\n    \n    if y > (x - 1):\n        val = (((x-1) * x) >> 1) + y - (x - 1)\n    else:\n        val = (y * (x - 1 + x - y)) >> 1\n        \n    return val     \n\n\nhobbits, pillows, k = [int(x) for x in input().split()]\n\nl = 1 \nr = pillows\n\nwhile l <= r:\n    m = (l + r) >> 1\n    \n    valor = is_ok(m, k) + is_ok(m, hobbits - k) + m\n    # print(valor, m, l, r)\n    \n    if valor < pillows:\n        l = m + 1\n    else:\n        r = m - 1\n\nprint(l)\n\n\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.15590626645012998,
+        "jaccard": 0.43103448275862066,
+        "tsed": 0.3974683544303799,
+        "cged": 0.3295194508009154,
+        "codebleu": 0.1719483481518717
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 9
+    },
+    {
+      "case": "701_D",
+      "src": {
+        "code": "n, L, v1, v2, k = map(int, input().split())\nn = (n + k - 1) // k * 2\ndif = v2 - v1\np1 = (n * v2 - dif) * L\np2 = (n * v1 + dif) * v2\nans = p1 / p2\nprint(ans)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n,l,v1,v2,k=map(int,input().split())\nm=(n-1)//k+1\nv=v1+v2\nx=l*v/(m*v-(m-1)*v1)\nprint(x/v2+(l-x)/v1)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.40117368172046575,
+        "jaccard": 0.6551724137931034,
+        "tsed": 0.6333333333333333,
+        "cged": 0.6294416243654822,
+        "codebleu": 0.27850877192982454
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 0
+    },
+    {
+      "case": "701_D",
+      "src": {
+        "code": "#!/usr/local/bin/python3\n# -*- coding:utf-8 -*-\n\nimport math\n\n# inputParams = input().split()\n# n = int(inputParams[0])\n# l = int(inputParams[1])\n# v1 = int(inputParams[2])\n# v2 = int(inputParams[3])\n# k = int(inputParams[4])\n\nn,l,v1,v2,k = map(int,input().split())\n\n# 运送次数\ntimes = math.ceil(n / k)\n\nt1 = l / (v2 + (2 * v2 / (v2 + v1)) * v1 * (times - 1))\ntotalTime = t1 + (2 * v2 / (v1 + v2)) * t1 * (times - 1)\n\nprint(str(totalTime))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def binSearch(n, L, v1, v2, k):\n    l = 0\n    r = L\n    while r-l > 0.000001:\n        d = (l+r)/2\n        td = d/v1\n        S = v2*td\n        g = d-S\n        tb = g/(v1+v2)\n        b = v1*tb\n        if n%k == 0:\n            a = n//k\n        else:\n            a = n//k + 1\n        if a*d-b*(a-1) > L:\n            r = d\n        else:\n            l = d\n    td = l / v1\n    S = v2 * td\n    g = l - S\n    tb = g / (v1 + v2)\n    b = v1 * tb\n    #return (a*td+(a-1)*tb)\n    return (a * d + (a - 1) * b) / v1\nn1, L1, v11, v21, k1 = map(int, input().split())\nprint('{0:.10f}'.format(binSearch(n1, L1, v21, v11, k1)))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.16219221710470488,
+        "jaccard": 0.3333333333333333,
+        "tsed": 0.28358208955223935,
+        "cged": 0.3502824858757062,
+        "codebleu": 0.1411875725987036
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 1
+    },
+    {
+      "case": "701_D",
+      "src": {
+        "code": "tmp = input()\n\ntmp = tmp.split(' ')\n\nn = int(tmp[0])\nl = int(tmp[1])\nv1 = int(tmp[2])\nv2 = int(tmp[3])\nk = int(tmp[4])\n\ndef canGo(timeLimit):\n    # dis = (v1 * t1) +v2(timeLimit - t1)\n    # dis = v1t1 v2tL - v2t1\n    # dis =  (v1 - v2)t1 + v2tl\n    # dis - v2tl = (v1-v2) t1\n\n    t1 = ( l - v2 * timeLimit) / (v1-v2)\n    t2 = timeLimit-t1 #bus\n\n    timeSpent = 0\n    pupilLeft = n\n    busPos = 0\n    pupilPos = 0\n    #print ('limit', timeLimit, 't2', t2)\n    while (timeSpent+ 0.0000005 < timeLimit):\n        if (pupilLeft <= 0):\n            return True\n        # bus go back\n        timeToMeet = (busPos-pupilPos)/(v1+v2)\n        timeSpent = timeSpent + timeToMeet\n        #print('busPos', busPos)\n        if (timeSpent+ 0.0000005 > timeLimit):\n            return False\n        busPos = busPos - v2 * timeToMeet\n        #print('busPos', busPos)\n        pupilPos = pupilPos + v1 * timeToMeet\n        # pick up\n        pupilLeft = pupilLeft - k\n        timeSpent  = timeSpent + t2\n        if (timeSpent+ 0.0000005 > timeLimit):\n            return False\n        pupilPos = pupilPos + v1 * t2\n        busPos = busPos + v2*t2\n        #print('busPos', busPos)\n    if pupilLeft<=0:\n        return False\n    else:\n        return True\n\ndef bsearch():\n    right = l / v1\n    left = l / v2\n\n    while (left + 0.0000005 < right):\n        mid = (left+ right )/2\n        #print('left', left,'right', right,'mid',mid)\n        result = canGo(mid)\n        if (result):\n            right = mid\n        else:\n            left = mid\n\n    return left\n\n\nprint(bsearch())\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n,l,v1,v2,k=map(int,input().split())\nm=(n-1)//k+1\nv=v1+v2\nx=l*v/(m*v-(m-1)*v1)\nprint(x/v2+(l-x)/v1)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.024545833868843535,
+        "jaccard": 0.2835820895522388,
+        "tsed": 0.12595155709342534,
+        "cged": 0.3096774193548387,
+        "codebleu": 0.1723684210526316
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 2
+    },
+    {
+      "case": "701_D",
+      "src": {
+        "code": "#coding=utf-8\nimport sys\neps = 1e-6\n\ndef solve(n, l, v1, v2):\n    t2 = 1.0 * (v1 + v2) * l / (n * (v1 + v2) * v2 - (n - 1) * v2 * (v2 - v1))\n    l2 = v2 * t2\n    l1 = l - l2\n    t1 = l1 / v1\n    #print(t1, l1, t2, l2)\n    return t1 + t2\n\n#print(solve(3, 6, 1, 2))\n#print(solve(1, 10, 1, 2))\n\nn, t, v1, v2, k = map(int, input().split())\nn = (n + k - 1) // k\n\nprint(solve(n, t, v1, v2))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n,l,v1,v2,k=map(int,input().split())\nm=(n-1)//k+1\nv=v1+v2\nx=l*v/(m*v-(m-1)*v1)\nprint(x/v2+(l-x)/v1)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.22184725838404712,
+        "jaccard": 0.4444444444444444,
+        "tsed": 0.2948275862068968,
+        "cged": 0.41295546558704455,
+        "codebleu": 0.2578947368421053
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 3
+    },
+    {
+      "case": "701_D",
+      "src": {
+        "code": "array = list(map(int,input().split()))\nn = int(array[0])\nl = int(array[1])\nv1 = int(array[2])\nv2 = int(array[3])\nk = int(array[4])\n\nbus = n//k\nif n%k != 0:\n    bus += 1\n\nV = (v1+v2) + 2*v2*(bus-1)\nU = (v1+v2) + 2*v1*(bus-1)\n\nprint (l*V/U/v2)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "# -*- coding: utf-8 -*-\n\"\"\"\nCreated on Tue Jul 26 15:20:38 2016\n\n@author: pinku\n\"\"\"\nimport sys\n\nbkpstdin = sys.stdin\n#sys.stdin = open('in.txt','r')\n\n\nn,l,v1,v2,k = map(int,input().split(' '))\no = n/k\nif n%k == 1:\n    o+=1\nd = 1.0*o\n\nans = l*( ( (d*2.0)  - 1.0)*v2 + v1)\nans /= (v2 + ( (d*2.0) - 1.0)*v1)\nans /= v2\nprint(ans)\n\n\nsys.stdin = bkpstdin",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.17054157646143622,
+        "jaccard": 0.4032258064516129,
+        "tsed": 0.24552845528455322,
+        "cged": 0.4816326530612245,
+        "codebleu": 0.1454278872153797
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 4
+    },
+    {
+      "case": "701_D",
+      "src": {
+        "code": "n, l, v1, v2, k = map(int, input().split())\ncol = (n + k - 1) // k\nm = l / (1 + (2 * (col - 1) * v1) / (v1 + v2))\nprint(m / v2 + (l - m) / v1)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def binSearch(n, L, v1, v2, k):\n    l = 0\n    r = L\n    while r-l > 0.000001:\n        d = (l+r)/2\n        td = d/v1\n        S = v2*td\n        g = d-S\n        tb = g/(v1+v2)\n        b = v1*tb\n        if n%k == 0:\n            a = n//k\n        else:\n            a = n//k + 1\n        if a*d-b*(a-1) > L:\n            r = d\n        else:\n            l = d\n    td = l / v1\n    S = v2 * td\n    g = l - S\n    tb = g / (v1 + v2)\n    b = v1 * tb\n    #return (a*td+(a-1)*tb)\n    return (a * d + (a - 1) * b) / v1\nn1, L1, v11, v21, k1 = map(int, input().split())\nprint('{0:.10f}'.format(binSearch(n1, L1, v21, v11, k1)))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.0650235057593368,
+        "jaccard": 0.39622641509433965,
+        "tsed": 0.2736318407960205,
+        "cged": 0.29607250755287007,
+        "codebleu": 0.13691209374824528
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 5
+    },
+    {
+      "case": "701_D",
+      "src": {
+        "code": "s=input();\nli=s.split();\nn=int(li[0])\nl=int(li[1])\nv1=int(li[2])\nv2=int(li[3])\nk=int(li[4])\nt=n//k\nif n%k!=0:\n    t+=1\na=(v1+v2)*l/(v1+v2+2*(t-1)*v1)\nans=a/v2+(l-a)/v1\nprint(\"{0:.10f}\".format(ans))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n, l, v1, v2, k = list(map(int, input().split()))\np = [0]*(l+1)\np[1] = n\ni = l\nt = (n+k-1)/k\nlow = 0.0\nhi = 1e9+10\nfor i in range(100):\n  t1 = (hi+low)*0.5\n  len = t1 * t * v2 - (t-1) * v2 * t1 * (v2 - v1) / (v1 + v2)\n  if len>l:\n    hi = t1\n  else:\n    low = t1\nprint(t1+(l-t1*v2)/v1)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.18008898803180576,
+        "jaccard": 0.42857142857142855,
+        "tsed": 0.3558823529411767,
+        "cged": 0.30678466076696165,
+        "codebleu": 0.10365071303281789
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 6
+    },
+    {
+      "case": "701_D",
+      "src": {
+        "code": "n,l,v1,v2,k=map(int,input().split())\nm=(n-1)//k+1\nv=v1+v2\nx=l*v*v2/(m*v*v2-(m-1)*(v2-v1)*v2)\nprint(x/v2+(l-x)/v1)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "# -*- coding: utf-8 -*-\n\"\"\"\nCreated on Tue Jul 26 15:20:38 2016\n\n@author: pinku\n\"\"\"\nimport sys\n\nbkpstdin = sys.stdin\n#sys.stdin = open('in.txt','r')\n\n\nn,l,v1,v2,k = map(int,input().split(' '))\no = n/k\nif n%k == 1:\n    o+=1\nd = 1.0*o\nans = l*( (d*2.0  - 1.0)*v2 + v1)\nans /= (v2 + (d*2.0 - 1.0)*v1)\nans /= v2\nprint(ans)\n\n\nsys.stdin = bkpstdin",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.1807361245875783,
+        "jaccard": 0.36363636363636365,
+        "tsed": 0.4037037037037042,
+        "cged": 0.48672566371681414,
+        "codebleu": 0.09517657192075796
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 7
+    },
+    {
+      "case": "701_D",
+      "src": {
+        "code": "n, l, v1, v2, k = [int(x) for x in input().split()]\nx = (n+k-1)//k\nprint((l - ((l/v1)/((x/(v2-v1)) + ((x-1)/(v2+v1)) + (1/v1))))/v1)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def binSearch(n, L, v1, v2, k):\n    l = 0\n    r = L\n    while r-l > 0.000001:\n        d = (l+r)/2\n        td = d/v1\n        S = v2*td\n        g = d-S\n        tb = g/(v1+v2)\n        b = v1*tb\n        if n%k == 0:\n            a = n//k\n        else:\n            a = n//k + 1\n        if a*d-b*(a-1) > L:\n            r = d\n        else:\n            l = d\n    td = l / v1\n    S = v2 * td\n    g = l - S\n    tb = g / (v1 + v2)\n    b = v1 * tb\n    #return (a*td+(a-1)*tb)\n    return (a * d + (a - 1) * b) / v1\nn1, L1, v11, v21, k1 = map(int, input().split())\nprint('{0:.10f}'.format(binSearch(n1, L1, v21, v11, k1)))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.057598398784750815,
+        "jaccard": 0.32142857142857145,
+        "tsed": 0.2537313432835824,
+        "cged": 0.26415094339622647,
+        "codebleu": 0.12047274431275673
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 8
+    },
+    {
+      "case": "701_D",
+      "src": {
+        "code": "s=input();\nli=s.split();\nn=int(li[0])\nl=int(li[1])\nv1=int(li[2])\nv2=int(li[3])\nk=int(li[4])\nt=n//k\nif n%k!=0:\n    t+=1\na=(v1+v2)*l/(v1+v2+2*(t-1)*v1)\nans=a/v2+(l-a)/v1\nprint(\"{0:.10f}\".format(ans))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "# -*- coding: utf-8 -*-\n\"\"\"\nCreated on Tue Jul 26 15:20:38 2016\n\n@author: pinku\n\"\"\"\nimport sys\n\nbkpstdin = sys.stdin\n#sys.stdin = open('in.txt','r')\n\n\nn,l,v1,v2,k = map(int,input().split(' '))\no = n/k\nif n%k == 1:\n    o+=1\nd = 1.0*o\nans = l*( (d*2.0  - 1.0)*v2 + v1)\nans /= (v2 + (d*2.0 - 1.0)*v1)\nans /= v2\nprint(ans)\n\n\nsys.stdin = bkpstdin",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.1443577850090238,
+        "jaccard": 0.36363636363636365,
+        "tsed": 0.3238095238095241,
+        "cged": 0.4152542372881356,
+        "codebleu": 0.14041986121999456
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 9
+    },
+    {
+      "case": "527_A",
+      "src": {
+        "code": "A = input()\nA = list(map(int , A.split(' ')))\na = A[0]\nb = A[1]\ncont = 0\nwhile a != b:\n\tmini = min(a,b)\n\tmaxi = max(a,b)\n\tcont = cont + maxi//mini\n\ta = mini\n\tb = maxi%mini\n\tif b == 0:\n\t\tbreak\nif b != 0:\n\tcont = cont +1\nprint(cont)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "a,b=map(int, input().split())\nn=0\ny=0\nwhile a!=b and y==0:\n    if b>a:\n        x=b\n        b=a\n        a=x\n    if b==1:\n        y=1\n        n=a-2\n    a=a-b\n    n+=1\nprint(n+1)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.24389417968133156,
+        "jaccard": 0.5,
+        "tsed": 0.4174757281553399,
+        "cged": 0.4128440366972477,
+        "codebleu": 0.22228870743810242
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 0
+    },
+    {
+      "case": "527_A",
+      "src": {
+        "code": "a, b = map(int, input().split())\nret = 0\nwhile 1:\n    if b == 0:\n        break\n    ret += a // b\n    a, b = max(b, a % b), min(b, a % b)\nprint(ret)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import sys\ninput = sys.stdin.readline\n \n############ ---- Input Functions ---- ############\ndef inp():\n    return(int(input()))\ndef inlt():\n    return(list(map(int,input().split())))\ndef insr():\n    s = input()\n    return(list(s[:len(s) - 1]))\ndef invr():\n    return(map(int,input().split()))\n    \n## --------- ##\ndef main():\n    # Show input\n    print(inlt())\n    \n    return 1\n\nmain()",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.043934050647084735,
+        "jaccard": 0.26666666666666666,
+        "tsed": 0.3142857142857152,
+        "cged": 0.29850746268656714,
+        "codebleu": 0.16826828061556415
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 1
+    },
+    {
+      "case": "527_A",
+      "src": {
+        "code": "w, h = map(int, input().split())\nturns = 0\nwhile (h != w) and (h != 0) and (w != 0):\n    if h > w:\n        turns += h // w\n        h = h % w\n    else:\n        turns += w // h\n        w = w % h\nprint (turns)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import sys\ninput = sys.stdin.readline\n\n############ ---- Input Functions ---- ############\ndef inp():\n    return(int(input()))\ndef inlt():\n    return(list(map(int,input().split())))\ndef insr():\n    s = input()\n    return(list(s[:len(s) - 1]))\ndef invr():\n    return(map(int,input().split()))\n    \n## --------- ##\ndef main():\n    # Show input\n    print(inlt())\n    \n    return 1\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.06329105900179942,
+        "jaccard": 0.2391304347826087,
+        "tsed": 0.22772277227722829,
+        "cged": 0.25688073394495414,
+        "codebleu": 0.14970123006079705
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 2
+    },
+    {
+      "case": "527_A",
+      "src": {
+        "code": "read = lambda: map(int, input().split())\na, b = read()\ncnt = 0\nwhile b:\n    cnt += a // b\n    a, b = b, a % b\nprint(cnt)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "a,b=map(int, input().split())\nn=0\ny=0\nwhile a!=b and y==0:\n    if b>a:\n        x=b\n        b=a\n        a=x\n    if b==1:\n        y=1\n        n+=a-2\n    if b==2:\n        y=1\n        if a%2==0:\n            n+=a//2-2\n        else:\n            n+=a//2+1-2\n    a=a-b\n    n+=1\nprint(n+1)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.1104688383747709,
+        "jaccard": 0.5625,
+        "tsed": 0.4151260504201689,
+        "cged": 0.33333333333333337,
+        "codebleu": 0.10125361983138464
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 3
+    },
+    {
+      "case": "527_A",
+      "src": {
+        "code": "a,b=map(int,input().split())\nans=0\nwhile a>b:\n    ans=ans+a//b\n    c=b\n    b=a-(a//b)*b\n    a=c\n    if b==0:\n        break\nprint(ans)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "#n = int(input())\nn, m = map(int, input().split())\n#s = input()\n#c = list(map(int, input().split()))\nl = 0\nwhile min(m, n) != 0:\n    if max(m, n) == n:\n        m, n = n, m\n    l += m // n\n    m %= n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.17339794450954227,
+        "jaccard": 0.47058823529411764,
+        "tsed": 0.5,
+        "cged": 0.4277456647398844,
+        "codebleu": 0.28882511425934476
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 4
+    },
+    {
+      "case": "527_A",
+      "src": {
+        "code": "a,b = input().split()\na = int(a)\nb = int(b)\ni = 0\n\nwhile a != b:\n    if a%b == 0:\n        i = i + a/b\n        break\n    \n    else:\n        i = i + a//b\n        c = b\n        b = a%b\n        a = c\n        \nprint (int(i))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "b,a=map(int,input().split())\ns=0\nwhile b!=0:\n    s=s+int(b/a)\n    a,b=b,a%b\nprint(s)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.20558116058609074,
+        "jaccard": 0.72,
+        "tsed": 0.4095238095238095,
+        "cged": 0.45360824742268047,
+        "codebleu": 0.17043404844526383
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 5
+    },
+    {
+      "case": "527_A",
+      "src": {
+        "code": "a, b = map(int, input().split())\n\nc = 0\nwhile True:\n    if a == b:\n        c += 1\n        break\n    elif b == 1:\n        c += a\n        break\n    elif a % b == 0:\n        c += a // b\n        break\n    else:\n        c += a // b\n        t = b\n        b = a % b\n        a = t\n\nprint(c)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import sys\ninput = sys.stdin.readline\n \n############ ---- Input Functions ---- ############\ndef inp():\n    return(int(input()))\ndef inlt():\n    return(list(map(int,input().split())))\ndef insr():\n    s = input()\n    return(list(s[:len(s) - 1]))\ndef invr():\n    return(map(int,input().split()))\n    \n## --------- ##\ndef main():\n    # Show input\n    input_ = (list(map(int,input().split())))\n    print(f\"input: {input_}\")\n    \n    return 1",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.05186318451540992,
+        "jaccard": 0.23529411764705882,
+        "tsed": 0.19344262295082032,
+        "cged": 0.3063063063063063,
+        "codebleu": 0.15274866035415832
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 6
+    },
+    {
+      "case": "527_A",
+      "src": {
+        "code": "#!/usr/bin/env python3\n\na, b = map(int, input().split(' '))\n\nships_num = 0\n\nwhile b != 0:\n    ships_num += a // b\n    a, b = b, a % b\n\nprint(ships_num)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "\na,b = map(int,input().split())\nt = 0\ng = 0\nwhile a!=b:\n\tif b ==1:\n\t\tt+=a\n\t\tprint(t)\n\t\texit()\n\telse:\n\t\tt+=(a-b)//b\n\t\tg = a-b\n\t\ta = b+a%(a-b)\n\t\tb = g\n\t\t\n\t\t\n\t\t\n\t\nprint(t)\n\n\n\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.25774755001573707,
+        "jaccard": 0.59375,
+        "tsed": 0.5505882352941175,
+        "cged": 0.6101694915254237,
+        "codebleu": 0.1887384408705368
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 7
+    },
+    {
+      "case": "527_A",
+      "src": {
+        "code": "import time\nimport collections\n\nclass Time_test:\n    def __enter__(self):\n        self.enter_time = time.time()\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        print(\"Command was executed in\", time.time()-self.enter_time)\n\nn, m = [int(x) for x in input().split()]\n\ncounter = 0\nwhile True:\n    tmp = max(n, m) // min(n, m)\n    if m > n:\n        m -= n*tmp\n    else:\n        n -= m*tmp\n    counter += tmp\n    if n == 0 or m == 0:\n        break\n\nprint(counter)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import sys\n\nif __name__ == '__main__':\n\n    a, b = list(map(int, input().split(\" \")))\n\n    count = 0\n    while a != b:\n\n        if a == 1:\n            count += b\n            print (count)\n            sys.exit(0)\n        elif b == 1:\n            count += a\n            print (count)\n            sys.exit(0)\n\n        if a > b:\n            a = a - b\n        else:\n            temp = a\n            a = b - a\n            b = temp\n        count += 1\n\n    print (count)\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.09171698435673321,
+        "jaccard": 0.2903225806451613,
+        "tsed": 0.3000000000000004,
+        "cged": 0.39610389610389607,
+        "codebleu": 0.2161327556288422
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 8
+    },
+    {
+      "case": "527_A",
+      "src": {
+        "code": "a,b = map(int, input().split())\n\n\ndef origami(a,b):\n\tcount = 0\n\twhile a>0 and b>0:\n\t\ta,b = max(a,b), min(a,b)\n\t\tcount += a//b\n\t\ta = a%b\n\treturn count\n\nprint(origami(a,b))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "a,b=map(int,input().split())\ns=0\nwhile b!=0:\n    s=s+int(b/a)\n    a,b=b,a%b\nprint(s)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.3013754760139566,
+        "jaccard": 0.6428571428571429,
+        "tsed": 0.5813333333333334,
+        "cged": 0.4,
+        "codebleu": 0.30867887117063275
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 9
+    },
+    {
+      "case": "p02350",
+      "src": {
+        "code": "import math\nfrom collections import deque\n\n\nclass SegmentTree:\n    __slots__ = [\"rank\", \"elem_size\", \"tree_size\", \"tree\", \"lazy\", \"default_value\"]\n\n    def __init__(self, a: list, default: int):\n        self.default_value = default\n        real_size = len(a)\n        self.rank = math.ceil(math.log2(real_size))\n        self.elem_size = 1 << self.rank\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        # self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def process_query(self, l: int, r: int, value: int = None):\n        '''[x, y)'''\n        tree, lazy, elem_size, rank = self.tree, self.lazy, self.elem_size, self.rank-1\n        l, r, targets, p_l, p_r, l_rank, r_rank = l+elem_size, r+elem_size, deque(), 0, 0, 0, 0\n        t_ap = targets.append\n\n        while l < r:\n            if l & 1:\n                t_ap(l)\n                p_l = p_l or l >> 1\n                l_rank = l_rank or rank\n                l += 1\n            if r & 1:\n                r -= 1\n                t_ap(r)\n                p_r = p_r or r >> 1\n                r_rank = r_rank or rank\n            l >>= 1\n            r >>= 1\n            rank -= 1\n\n        deepest = (p_l, p_r)\n\n        paths = [[p_l >> n for n in range(l_rank-1, -1, -1)], [p_r >> n for n in range(r_rank-1, -1, -1)]]\n\n        for a in paths:\n            for i in a:\n                if lazy[i] is None:\n                    continue\n                # ===== change me =====\n                tree[i] = lazy[i]\n                if i < elem_size:\n                    lazy[i << 1] = lazy[i]\n                    lazy[(i << 1)+1] = lazy[i]\n                lazy[i] = None\n\n        result = self.default_value\n        for i in targets:\n            v = value if value is not None else lazy[i]\n            # ===== change me =====\n            if v is not None:\n                if i < elem_size:\n                    lazy[i << 1] = v\n                    lazy[(i << 1)+1] = v\n                tree[i] = v\n                lazy[i] = None\n            if result > tree[i]:\n                result = tree[i]\n\n        self.update_tree(deepest)\n\n        return result\n\n    def update_tree(self, indexes: tuple):\n        ''' ????????????lazy?????¨????????¬????????§???????????¨???????????¨???????????? '''\n\n        tree, lazy = self.tree, self.lazy\n\n        for k in indexes:\n            while k > 0:\n                left, right = k << 1, (k << 1)+1\n                # ===== change me =====\n                l_value = tree[left] if lazy[left] is None else lazy[left]\n                r_value = tree[right] if lazy[right] is None else lazy[right]\n                tree[k] = l_value if l_value < r_value else r_value\n\n                k >>= 1\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.process_query(l[1], l[2]+1, l[3])\n    else:\n        a = rmq.process_query(l[1], l[2]+1)\n        append(a)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import math\n\n\nclass SegmentTree:\n    __slots__ = [\"elem_size\", \"tree_size\", \"tree\", \"lazy\"]\n\n    def __init__(self, a: list, default: int):\n        real_size = len(a)\n        self.elem_size = 1 << math.ceil(math.log2(real_size))\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def get_indexes(self, l: int, r: int):\n        '''[x, y)'''\n        l, r, indexes = l+self.elem_size, r+self.elem_size, []\n        append = indexes.append\n        while l < r:\n            if l & 1:\n                append(l)\n                l += 1\n            if r & 1:\n                r -= 1\n                append(r)\n            l, r = l >> 1, r >> 1\n\n        return indexes\n\n    def get_indexes_with_propagation(self, l: int, r: int, current_node: int, l_end: int, r_end: int):\n        # print(l,r,current_node,l_end,r_end,self.lazy[current_node])\n        indexes = []\n        tree, lazy = self.tree, self.lazy\n        lazy_value = lazy[current_node]\n        left_child, right_child = current_node << 1, (current_node << 1) + 1\n\n        if lazy_value is not None:\n            self.lazy[current_node] = None\n            tree[current_node] = lazy_value\n            if left_child < self.tree_size:\n                if left_child < self.elem_size:\n                    lazy[left_child] = lazy[right_child] = lazy_value\n                else:\n                    tree[left_child] = tree[right_child] = lazy_value\n\n        if l == l_end and r == r_end:\n            return [current_node]\n\n        mid = (l_end + r_end) // 2\n\n        if l < mid:\n            l_r = r if r < mid else mid\n            indexes += self.get_indexes_with_propagation(l, l_r, left_child, l_end, mid)\n\n        if r > mid:\n            r_l = l if mid < l else mid\n            indexes += self.get_indexes_with_propagation(r_l, r, right_child, mid, r_end)\n\n        return indexes\n\n    def update_lazy(self, l, r, value):\n        indexes = sorted(self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size))\n        l = self.elem_size\n        lazy, tree = self.lazy, self.tree\n        for n in indexes:\n            lazy[n] = None\n            if n < l//2:\n                lazy[n << 1] = value\n                lazy[(n << 1)+1] = value\n            elif n < l:\n                tree[n << 1] = value\n                tree[(n << 1)+1] = value\n            else:\n                tree[n] = value\n            self.update_tree(n)\n\n    def get_value(self, l: int, r: int):\n        tree = self.tree\n        index_list = self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size)\n\n        # ===== change me =====\n        return min(tree[n] for n in index_list)\n\n    def update_tree(self, k: int):\n        tree, lazy = self.tree, self.lazy\n        if k >= self.elem_size:\n            k >>= 1\n\n        while k > 1:\n            left, right = k << 1, (k << 1)+1\n            left_value = lazy[left] or tree[left]\n            right_value = lazy[right] or tree[right]\n            # ===== change me =====\n            tree[k] = left_value if left_value < right_value else right_value\n\n            k >>= 1\n\n    def set_value(self, i: int, value: int, op: str):\n        k = self.elem_size + i\n        if op == \"=\":\n            self.tree[k] = value\n        elif op == \"+\":\n            self.tree[k] += value\n        self.update_tree(k)\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.update_lazy(l[1], l[2]+1, l[3])\n    else:\n        ans.append(rmq.get_value(l[1], l[2]+1))\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.5188377291546414,
+        "jaccard": 0.6446280991735537,
+        "tsed": 0.548666666666666,
+        "cged": 0.0,
+        "codebleu": 0.4344022528980356
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 0
+    },
+    {
+      "case": "p02350",
+      "src": {
+        "code": "import sys\ninput = sys.stdin.readline\nINF = 2**31 - 1\n\nclass LazySegmentTree:\n    def __init__(self, n):\n        LV = (n-1).bit_length()\n        self.N0 = 2 ** LV\n        self.data = [INF] * (2*self.N0)\n        self.lazy = [None] * (2*self.N0)\n        \n    def gindex(self, l, r):\n        L = l + self.N0; R = r + self.N0\n        lm = (L // (L & -L)) >> 1\n        rm = (R // (R & -R)) >> 1\n    \n        while L < R:\n            if R <= rm:\n                yield R\n            if L <= lm:\n                yield L\n            \n            L >>= 1; R >>= 1\n        \n        while L:\n            yield L\n            L >>= 1\n\n    def propagates(self, *ids):\n        for i in reversed(ids):\n            v = self.lazy[i-1]\n            \n            if v is None:\n                continue\n            \n            self.lazy[2*i-1] = self.data[2*i-1] = self.lazy[2*i] = self.data[2*i] = v\n            self.lazy[i-1] = None\n\n    def update(self, l, r, x):\n        *ids, = self.gindex(l, r)\n        self.propagates(*ids)\n\n        L = self.N0 + l; R = self.N0 + r\n        \n        while L < R:\n            if R & 1:\n                R -= 1\n                self.lazy[R-1] = self.data[R-1] = x\n            if L & 1:\n                self.lazy[L-1] = self.data[L-1] = x\n                L += 1\n                \n            L >>= 1; R >>= 1\n            \n        for i in ids:\n            self.data[i-1] = min(self.data[2*i-1], self.data[2*i])\n\n    def query(self, l, r):\n        self.propagates(*self.gindex(l, r))\n        L = self.N0 + l; R = self.N0 + r\n\n        s = INF\n        \n        while L < R:\n            if R & 1:\n                R -= 1\n                s = min(s, self.data[R-1])\n            if L & 1:\n                s = min(s, self.data[L-1])\n                L += 1\n                \n            L >>= 1; R >>= 1\n            \n        return s\n\nn, q = map(int, input().split())\nlst = LazySegmentTree(n)\n\nfor _ in range(q):\n    que = list(map(int, input().split()))\n    \n    if que[0] == 0:\n        s, t, x = que[1], que[2], que[3]\n        lst.update(s, t+1, x)\n    elif que[0] == 1:\n        s, t = que[1], que[2]\n        print(lst.query(s, t+1))\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "from math import log2, ceil\n\n\nclass SegmentTree:\n    def __init__(self, n):\n        tn = 2 ** ceil(log2(n))\n        self.a = [2 ** 31 - 1] * (tn * 2)\n        self.l = tn * 2\n        self.tn = tn\n\n    def find(self, c, l, r, s, t):\n        if self.a[c] == -1:\n            return self.a[c // 2]\n        if s <= l and r <= t:\n            return self.a[c]\n        mid = (l + r) // 2\n        if t <= mid:\n            return self.find(c * 2, l, mid, s, t)\n        elif s > mid:\n            return self.find(c * 2 + 1, mid + 1, r, s, t)\n        else:\n            return min(\n                self.find(c * 2, l, mid, s, mid),\n                self.find(c * 2 + 1, mid + 1, r, mid + 1, t))\n\n    def update(self, c, l, r, s, t, x, f=False):\n\n        if not f and self.a[c] == -1:\n            f = self.a[c // 2]\n\n        if l == s and r == t:\n            return self.set(c, x)\n\n        mid = (l + r) // 2\n        if t <= mid:\n            rv, f = self.get_child(c, c * 2 + 1, f)\n            u = min(self.update(c * 2, l, mid, s, t, x, f), rv)\n        elif s > mid:\n            lv, f = self.get_child(c, c * 2, f)\n            u = min(lv, self.update(c * 2 + 1, mid + 1, r, s, t, x, f))\n        else:\n            u = min(\n                self.update(c * 2, l, mid, s, mid, x, f),\n                self.update(c * 2 + 1, mid + 1, r, mid + 1, t, x, f))\n            if f:\n                u = min(f, u)\n        self.a[c] = u\n\n        return u\n\n    def set(self, c, x):\n        self.a[c] = x\n        if c * 2 < self.l:\n            self.a[c * 2] = self.a[c * 2 + 1] = -1\n        return x\n\n    def get_child(self, c, child, f):\n        if f:\n            return self.set(child, f), f\n        v = self.a[child]\n        if v == -1:\n            f = self.a[c]\n            v = self.set(child, f)\n        return v, f\n\n\nn, q = map(int, input().split())\nst = SegmentTree(n)\nfor _ in range(q):\n    query = input().split()\n    if query[0] == '0':\n        s, t, x = map(int, query[1:])\n        st.update(1, 0, st.tn - 1, s, t, x)\n    else:\n        s, t = map(int, query[1:])\n        print(st.find(1, 0, st.tn - 1, s, t))\n        # print(st.a)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.2184091356748784,
+        "jaccard": 0.46464646464646464,
+        "tsed": 0.3424878836833598,
+        "cged": 0.0,
+        "codebleu": 0.2114592052112782
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 1
+    },
+    {
+      "case": "p02350",
+      "src": {
+        "code": "import math\nfrom collections import deque\n\n\nclass SegmentTree:\n    __slots__ = [\"rank\", \"elem_size\", \"tree_size\", \"tree\", \"lazy\", \"default_value\"]\n\n    def __init__(self, a: list, default: int):\n        self.default_value = default\n        real_size = len(a)\n        self.rank = math.ceil(math.log2(real_size))\n        self.elem_size = 1 << self.rank\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def propagate(self, l: int, r: int, value: int = None):\n        '''[x, y)'''\n        tree, lazy, elem_size, rank = self.tree, self.lazy, self.elem_size, self.rank-1\n        l, r, targets, p_l, p_r, l_rank, r_rank = l+elem_size, r+elem_size, deque(), 0, 0, 0, 0\n        t_ap = targets.append\n\n        while l < r:\n            if l & 1:\n                t_ap(l)\n                p_l = p_l or l >> 1\n                l_rank = l_rank or rank\n                l += 1\n            if r & 1:\n                r -= 1\n                t_ap(r)\n                p_r = p_r or r >> 1\n                r_rank = r_rank or rank\n            l >>= 1\n            r >>= 1\n            rank -= 1\n\n        deepest = (p_l, p_r)\n\n        paths = [[p_l >> n for n in range(l_rank-1, -1, -1)], [p_r >> n for n in range(r_rank-1, -1, -1)]]\n\n        for a in paths:\n            for i in a:\n                if lazy[i] is None:\n                    continue\n                # ===== change me =====\n                tree[i] = lazy[i]\n                if i < elem_size:\n                    lazy[i << 1] = lazy[i]\n                    lazy[(i << 1)+1] = lazy[i]\n                lazy[i] = None\n\n        result = self.default_value\n        if value is None:\n            for i in targets:\n                if lazy[i] is not None:\n                    tree[i] = lazy[i]\n                    if i < elem_size:\n                        lazy[i << 1] = lazy[i]\n                        lazy[(i << 1)+1] = lazy[i]\n                    lazy[i] = None\n                # ===== change me =====\n                if result > tree[i]:\n                    result = tree[i]\n\n        else:\n            for i in targets:\n                # ===== change me =====\n                if i < elem_size:\n                    lazy[i << 1] = value\n                    lazy[(i << 1)+1] = value\n                tree[i] = value\n                lazy[i] = None\n\n        self.update_tree(deepest)\n\n        return result\n\n    def update_lazy(self, l, r, value):\n        self.propagate(l, r, value)\n\n    def get_value(self, l: int, r: int):\n        tree = self.tree\n        targets = self.propagate(l, r)\n\n        # ===== change me =====\n        return min(tree[n] for n in targets)\n\n    def update_tree(self, indexes: tuple):\n        ''' ????????????lazy?????¨????????¬????????§???????????¨???????????¨???????????? '''\n\n        tree, lazy = self.tree, self.lazy\n\n        for k in indexes:\n            while k > 0:\n                left, right = k << 1, (k << 1)+1\n                # ===== change me =====\n                l_value = tree[left] if lazy[left] is None else lazy[left]\n                r_value = tree[right] if lazy[right] is None else lazy[right]\n                tree[k] = l_value if l_value < r_value else r_value\n\n                k >>= 1\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.propagate(l[1], l[2]+1, l[3])\n    else:\n        a = rmq.propagate(l[1], l[2]+1)\n        append(a)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "INT_MAX = 1<<31 - 1\n_N,query_num = map(int, input().split())\nqueries = [list(map(int, input().split())) for i in range(query_num)]\nN = 1<<17\n\narr_size = 2*N - 1\nA = [INT_MAX]*(arr_size)\nlazy_A = [None]*(arr_size)\n\ndef tree_propagate(k):\n\n    if(lazy_A[k] is None):\n        return\n\n    if(k < N // 2):\n        A[k*2+1] = A[k*2+2] = lazy_A[k*2+1] = lazy_A[k*2+2] = lazy_A[k]\n        lazy_A[k] = None\n        return\n    if(k < N-1):\n        A[k*2+1] = A[k*2+2] = lazy_A[k]\n        lazy_A[k] = None\n\ndef update(s,t,x,k,l,r):\n\n    if (r <= s or t <= l):\n        return\n    if (s <= l and r <= t):\n        A[k] = x\n        if(k < N-1):\n            lazy_A[k] = x\n        return\n\n    tree_propagate(k)\n    center = (l+r)//2\n    update(s, t, x, k*2 + 1, l, center)\n    update(s, t, x, k*2 + 2, center, r)\n\n    A[k] = min(A[k*2+1], A[k*2+2])\n\ndef find(s,t,k,l,r):\n\n    if (r <= s or t <= l):\n        return INT_MAX\n\n    if(s <= l and r <= t):\n        return A[k]\n\n    tree_propagate(k)\n    center = (l+r)//2\n    v_left = find(s, t, k*2 + 1, l, center)\n    v_right = find(s, t, k*2 + 2, center, r)\n    return min(v_left,v_right)\n\nanswers = []\nfor query in queries:\n    # update\n    if(query[0]==0):\n        update(query[1],query[2]+1,query[3],0,0,N)\n    # find\n    else:\n        answers.append(find(query[1],query[2]+1,0,0,N))\n\nprint(\"\\n\".join([str(ans) for ans in answers]))\n\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.13833432575340698,
+        "jaccard": 0.38016528925619836,
+        "tsed": 0.26620530565167266,
+        "cged": 0.0,
+        "codebleu": 0.19840870365139
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 2
+    },
+    {
+      "case": "p02350",
+      "src": {
+        "code": "# https://onlinejudge.u-aizu.ac.jp/courses/library/3/DSL/all/DSL_2_F\n# 遅延セグ木\n\n\ndef _gidx(l, r, treesize):\n    '''\n    lazy propagation用idx生成器 木の下から生成される。1based-indexなので注意.(使うときは-1するとか)\n    もとの配列において[l,r)を指定したときに更新すべきidxをyieldする\n    treesizeは多くの場合self.num\n    '''\n    L, R = l + treesize, r + treesize\n    lm = (L // (L & -L)) >> 1  # これで成り立つの天才か？\n    rm = (R // (R & -R)) >> 1\n    while L < R:\n        if R <= rm:\n            yield R\n        if L <= lm:\n            yield L\n        L >>= 1\n        R >>= 1\n    while L:  # Rでもいいけどね\n        yield L\n        L >>= 1\n\n\nclass SegmentTreeForRMQ:  # range minimum query\n    def __init__(self, ls: list, segfunc=min, identity_element=2**63, lazy_ide=None):\n        '''\n        セグ木\n        一次元のリストlsを受け取り初期化する。O(len(ls))\n        区間のルールはsegfuncによって定義される\n        identity elementは単位元。e.g., 最小値を求めたい→inf, 和→0, 積→1, gcd→0\n        [単位元](https://ja.wikipedia.org/wiki/%E5%8D%98%E4%BD%8D%E5%85%83)\n        '''\n        self.ide = identity_element\n        self.lide = lazy_ide  # lazy用単位元\n        self.func = segfunc\n        n = len(ls)\n        self.num = 2 ** (n - 1).bit_length()  # n以上の最小の2のべき乗\n        self.tree = [self.ide] * (2 * self.num)  # 関係ない値を-1においてアクセスを許すと都合が良い\n        self.lazy = [self.lide] * (2 * self.num)  # 遅延配列\n        for i, l in enumerate(ls):  # 木の葉に代入\n            self.tree[i + self.num - 1] = l\n        for i in range(self.num - 2, -1, -1):  # 子を束ねて親を更新\n            self.tree[i] = segfunc(self.tree[2 * i + 1], self.tree[2 * i + 2])\n\n    def _lazyprop(self, *ids):\n        '''\n        遅延評価用の関数\n        - self.tree[i] に self.lazy[i]の値を伝播させて遅延更新する\n        - 子ノードにself.lazyの値を伝播させる **ここは問題ごとに書き換える必要がある**\n        - self.lazy[i]をリセットする\n        '''\n        for i in reversed(ids):\n            i -= 1  # 0basedindexに修正\n            v = self.lazy[i]\n            if v == self.lide:\n                continue  # 単位元ならする必要のNASA\n            # どうやって遅延更新するかは問題によってことなる\n            # 今回なら数字書き換えなので数字をそのまま子ノードに伝播\n            # lazyもtreeも書き換える必要あり\n            self.tree[2 * i + 1] = v\n            self.tree[2 * i + 2] = v\n            self.lazy[2 * i + 1] = v\n            self.lazy[2 * i + 2] = v\n            self.lazy[i] = self.lide  # 遅延配列を空に戻す\n\n    def update(self, l, r, x):\n        '''\n        [l,r)番目の要素をxに変更する(木の中間ノードも更新する) O(logN)\n        '''\n        # 1, 根から区間内においてlazyの値を伝播しておく(self.treeの値が有効になる)\n        ids = tuple(_gidx(l, r, self.num))\n        self._lazyprop(*ids)\n        # 2, 区間に対してtree,lazyの値を更新 (treeは根方向に更新するため、lazyはpropで葉方向に更新するため)\n        if r <= l:\n            return ValueError('invalid index (l,rがありえないよ)')\n        l += self.num\n        r += self.num\n        while l < r:\n            if r & 1:\n                r -= 1  # 一旦半開ではなくするために\n                self.tree[r - 1] = x\n                self.lazy[r - 1] = x\n            if l & 1:\n                self.tree[l - 1] = x\n                self.tree[l - 1] = x  # ここのセットの仕方も問題によって変えるべし\n                self.lazy[l - 1] = x  # lazyの区間に値をセット\n                l += 1\n            l >>= 1\n            r >>= 1\n        # 3, 伝播させた区間について下からdataの値を伝播する\n        for i in ids:\n            i -= 1  # to 0based\n            self.tree[i] = self.func(\n                self.tree[2 * i + 1], self.tree[2 * i + 2])\n\n    def query(self, l, r):\n        '''\n        区間[l,r)に対するクエリをO(logN)で処理する。例えばその区間の最小値、最大値、gcdなど\n        '''\n        if r <= l:\n            return ValueError('invalid index (l,rがありえないよ)')\n        # 1, 根からにlazyの値を伝播させる\n        self._lazyprop(*_gidx(l, r, self.num))\n        # 2, 区間[l,r)の最小値を求める\n        l += self.num\n        r += self.num\n        res = self.ide\n        while l < r:  # 右から寄りながら結果を結合していくイメージ\n            if r & 1:\n                r -= 1\n                res = self.func(res, self.tree[r - 1])\n            if l & 1:\n                res = self.func(res, self.tree[l - 1])\n                l += 1\n            l >>= 1\n            r >>= 1  # 親の一つ左に移動\n        return res\n\n\nn, q = map(int, input().split())\nls = [2 ** 31 - 1] * n\nseg = SegmentTreeForRMQ(ls, identity_element=2**31 - 1)\n\nfor _ in range(q):\n    cmd, *tmp = map(int, input().split())\n    if cmd == 0:\n        s, t, x = tmp\n        seg.update(s, t + 1, x)\n    else:\n        s, t = tmp\n        print(seg.query(s, t + 1))\n\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import math\n\n\nclass SegmentTree:\n    __slots__ = [\"elem_size\", \"tree_size\", \"tree\", \"lazy\"]\n\n    def __init__(self, a: list, default: int):\n        real_size = len(a)\n        self.elem_size = 1 << math.ceil(math.log2(real_size))\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def get_indexes(self, l: int, r: int):\n        '''[x, y)'''\n        l, r, targets, path, p_l, p_r, = l+self.elem_size, r+self.elem_size, [], [], 0, 0\n        t_ap, p_add = targets.append, path.append\n\n        while l < r:\n            if l & 1:\n                t_ap(l)\n                p_l = p_l or l >> 1\n                l += 1\n            if r & 1:\n                r -= 1\n                t_ap(r)\n                p_r = p_r or r >> 1\n            l, r = l >> 1, r >> 1\n\n        deepest = (p_l, p_r)\n\n        while p_l > 1 or p_r > 1:\n            if p_l > 1:\n                p_add(p_l)\n                p_l >>= 1\n            if p_l != p_r > 1:\n                p_add(p_r)\n            p_r >>= 1\n\n        # print(targets, path)\n        return targets, sorted(path), deepest\n\n    def propagate(self, indexes: list, value: int = None):\n        tree, lazy, elem_size = self.tree, self.lazy, self.elem_size\n        if value is None:\n            for n in indexes:\n                if lazy[n] is None:\n                    continue\n                tree[n] = lazy[n]\n                if n < elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = lazy[n]\n                lazy[n] = None\n        else:\n            for n in indexes:\n                if n < elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = value\n                tree[n] = value\n                lazy[n] = None\n\n    def get_indexes_with_propagation(self, l: int, r: int, current_node: int, l_end: int, r_end: int):\n        # print(l,r,current_node,l_end,r_end,self.lazy[current_node])\n        indexes = []\n        tree, lazy = self.tree, self.lazy\n        lazy_value, lazy[current_node] = lazy[current_node], None\n        left_child, right_child = current_node << 1, (current_node << 1) + 1\n\n        if lazy_value is not None:\n            tree[current_node] = lazy_value\n            if left_child < self.tree_size:\n                lazy[left_child] = lazy[right_child] = lazy_value\n\n        if l == l_end and r == r_end:\n            return [current_node]\n\n        mid = (l_end + r_end) // 2\n\n        if l < mid:\n            l_r = r if r < mid else mid\n            indexes += self.get_indexes_with_propagation(l, l_r, left_child, l_end, mid)\n        if r > mid:\n            r_l = l if mid < l else mid\n            indexes += self.get_indexes_with_propagation(r_l, r, right_child, mid, r_end)\n\n        return indexes\n\n    def update_lazy(self, l, r, value):\n        '''\n        indexes = sorted(self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size))\n        l = self.elem_size\n        lazy, tree, update = self.lazy, self.tree, self.update_tree\n        for n in indexes:\n            lazy[n] = None\n            if n < l:\n                lazy[n << 1] = value\n                lazy[(n << 1)+1] = value\n            tree[n] = value\n            update(n)\n        print(\"update_lazy\",indexes)\n        '''\n        targets, paths, deepest = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets, value)\n        self.update_tree(deepest[0])\n        self.update_tree(deepest[1])\n\n    def get_value(self, l: int, r: int):\n        '''\n        tree = self.tree\n        indexes = self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size)\n        update = self.update_tree\n        for n in indexes:\n            update(n)\n        '''\n        tree = self.tree\n        targets, paths, deepest = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets)\n        self.update_tree(deepest[0])\n        self.update_tree(deepest[1])\n\n        # ===== change me =====\n        #print([(n,tree[n]) for n in indexes])\n        return min(tree[n] for n in targets)\n\n    def update_tree(self, k: int):\n        tree, lazy = self.tree, self.lazy\n        if k >= self.elem_size:\n            k >>= 1\n\n        while k > 0:\n            left, right = k << 1, (k << 1)+1\n            if lazy[k] is None:\n                if lazy[left] is not None:\n                    tree[left] = lazy[left]\n                if lazy[right] is not None:\n                    tree[right] = lazy[right]\n                tree[k] = tree[left] if tree[left] < tree[right] else tree[right]\n            else:\n                tree[left] = tree[right] = tree[k] = lazy[k]\n                lazy[left] = lazy[right] = lazy[k] = None\n            # ===== change me =====\n\n            k >>= 1\n\n    def set_value(self, i: int, value: int, op: str):\n        k = self.elem_size + i\n        if op == \"=\":\n            self.tree[k] = value\n        elif op == \"+\":\n            self.tree[k] += value\n        self.update_tree(k)\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.update_lazy(l[1], l[2]+1, l[3])\n        #print(rmq.get_indexes(l[1],l[2]+1))\n    else:\n        a = rmq.get_value(l[1], l[2]+1)\n        #print(rmq.get_indexes(l[1],l[2]+1))\n        append(a)\n    #print(rmq.tree,rmq.lazy)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.1742909058465698,
+        "jaccard": 0.21666666666666667,
+        "tsed": 0.3183673469387784,
+        "cged": 0.0,
+        "codebleu": 0.16016980190337315
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 3
+    },
+    {
+      "case": "p02350",
+      "src": {
+        "code": "import math\nfrom collections import deque\n\n\nclass SegmentTree:\n    __slots__ = [\"elem_size\", \"tree_size\", \"tree\", \"lazy\"]\n\n    def __init__(self, a: list, default: int):\n        real_size = len(a)\n        self.elem_size = 1 << math.ceil(math.log2(real_size))\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def get_indexes(self, l: int, r: int):\n        '''[x, y)'''\n        l, r, targets, path, p_l, p_r = l+self.elem_size, r+self.elem_size, deque(), deque(), 0, 0\n        t_ap, p_ap = targets.append, path.appendleft\n\n        while l < r:\n            if l & 1:\n                t_ap(l)\n                p_l = p_l or l >> 1\n                l += 1\n            if r & 1:\n                r -= 1\n                t_ap(r)\n                p_r = p_r or r >> 1\n            l >>= 1\n            r >>= 1\n\n        deepest = (p_l, p_r)\n\n        while p_l > 1 or p_r > 1:\n            if p_r != p_l > 1:\n                p_ap(p_l)\n            p_l >>= 1\n            if p_r > 1:\n                p_ap(p_r)\n                p_r >>= 1\n\n        #print(targets, path)\n        return targets, path, deepest\n\n    def propagate(self, indexes: list, value: int = None):\n        tree, lazy, elem_size = self.tree, self.lazy, self.elem_size\n        if value is None:\n            for n in indexes:\n                if lazy[n] is None:\n                    continue\n                tree[n] = lazy[n]\n                if n < elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = lazy[n]\n                lazy[n] = None\n        else:\n            for n in indexes:\n                if n < elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = value\n                tree[n] = value\n                lazy[n] = None\n\n    def update_lazy(self, l, r, value):\n        targets, paths, deepest = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets, value)\n        self.update_tree(deepest)\n\n    def get_value(self, l: int, r: int):\n        tree = self.tree\n        targets, paths, deepest = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets)\n        self.update_tree(deepest)\n\n        # ===== change me =====\n        return min(tree[n] for n in targets)\n\n    def update_tree(self, indexes: tuple):\n        ''' ????????????lazy?????¨????????¬????????§???????????¨???????????¨???????????? '''\n\n        tree, lazy = self.tree, self.lazy\n\n        for k in indexes:\n            #if k >= self.elem_size:\n            #    k >>= 1\n\n            while k > 0:\n                left, right = k << 1, (k << 1)+1\n                # ===== change me =====\n                if lazy[left] is not None:\n                    tree[left] = lazy[left]\n                if lazy[right] is not None:\n                    tree[right] = lazy[right]\n                tree[k] = tree[left] if tree[left] < tree[right] else tree[right]\n\n                k >>= 1\n\n    def set_value(self, i: int, value: int, op: str):\n        k = self.elem_size + i\n        if op == \"=\":\n            self.tree[k] = value\n        elif op == \"+\":\n            self.tree[k] += value\n        self.update_tree(k)\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.update_lazy(l[1], l[2]+1, l[3])\n    else:\n        a = rmq.get_value(l[1], l[2]+1)\n        append(a)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import math\n\n\nclass SegmentTree:\n    __slots__ = [\"elem_size\", \"tree_size\", \"tree\", \"lazy\"]\n\n    def __init__(self, a: list, default: int):\n        real_size = len(a)\n        self.elem_size = 1 << math.ceil(math.log2(real_size))\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def get_indexes(self, l: int, r: int):\n        '''[x, y)'''\n        l, r, indexes = l+self.elem_size, r+self.elem_size, []\n        append = indexes.append\n        while l < r:\n            if l & 1:\n                append(l)\n                l += 1\n            if r & 1:\n                r -= 1\n                append(r)\n            l, r = l >> 1, r >> 1\n\n        return indexes\n\n    def get_indexes_with_propagation(self, l: int, r: int, current_node: int, l_end: int, r_end: int):\n        # print(l,r,current_node,l_end,r_end,self.lazy[current_node])\n        indexes = []\n        tree, lazy = self.tree, self.lazy\n        lazy_value = lazy[current_node]\n        left_child, right_child = current_node << 1, (current_node << 1) + 1\n\n        if lazy_value is not None:\n            self.lazy[current_node] = None\n            tree[current_node] = lazy_value\n            if left_child < self.tree_size:\n                if left_child < self.elem_size:\n                    lazy[left_child] = lazy[right_child] = lazy_value\n                else:\n                    tree[left_child] = tree[right_child] = lazy_value\n\n        if l == l_end and r == r_end:\n            return [current_node]\n\n        mid = (l_end + r_end) // 2\n\n        if l < mid:\n            l_r = r if r < mid else mid\n            indexes += self.get_indexes_with_propagation(l, l_r, left_child, l_end, mid)\n\n        if r > mid:\n            r_l = l if mid < l else mid\n            indexes += self.get_indexes_with_propagation(r_l, r, right_child, mid, r_end)\n\n        return indexes\n\n    def update_lazy(self, l, r, value):\n        indexes = sorted(self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size))\n        l = self.elem_size\n        lazy, tree, update = self.lazy, self.tree, self.update_tree\n        for n in indexes:\n            lazy[n] = None\n            if n < l//2:\n                lazy[n << 1] = value\n                lazy[(n << 1)+1] = value\n            elif n < l:\n                tree[n << 1] = value\n                tree[(n << 1)+1] = value\n            tree[n] = value\n            update(n)\n\n    def get_value(self, l: int, r: int):\n        tree = self.tree\n        indexes = self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size)\n        update = self.update_tree\n        for n in indexes:\n            update(n)\n\n        # ===== change me =====\n        return min(tree[n] for n in indexes)\n\n    def update_tree(self, k: int):\n        tree, lazy = self.tree, self.lazy\n        if k >= self.elem_size:\n            k >>= 1\n\n        while k > 0:\n            left, right = k << 1, (k << 1)+1\n            if lazy[k] is None:\n                if lazy[left] is not None:\n                    tree[left] = lazy[left]\n                if lazy[right] is not None:\n                    tree[right] = lazy[right]\n                tree[k] = tree[left] if tree[left] < tree[right] else tree[right]\n            else:\n                tree[left] = tree[right] = tree[k] = lazy[k]\n                lazy[left] = lazy[right] = lazy[k] = None\n            # ===== change me =====\n\n            k >>= 1\n\n    def set_value(self, i: int, value: int, op: str):\n        k = self.elem_size + i\n        if op == \"=\":\n            self.tree[k] = value\n        elif op == \"+\":\n            self.tree[k] += value\n        self.update_tree(k)\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.update_lazy(l[1], l[2]+1, l[3])\n    else:\n        a = rmq.get_value(l[1], l[2]+1)\n        append(a)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.6759572516033175,
+        "jaccard": 0.7304347826086957,
+        "tsed": 0.6597959183673464,
+        "cged": 0.41107266435986156,
+        "codebleu": 0.5452378244555836
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 4
+    },
+    {
+      "case": "p02350",
+      "src": {
+        "code": "import math\nfrom collections import deque\n\n\nclass SegmentTree:\n    __slots__ = [\"elem_size\", \"tree_size\", \"tree\", \"lazy\"]\n\n    def __init__(self, a: list, default: int):\n        real_size = len(a)\n        self.elem_size = 1 << math.ceil(math.log2(real_size))\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def get_indexes(self, l: int, r: int):\n        '''[x, y)'''\n        l, r, targets, path, p_l, p_r = l+self.elem_size, r+self.elem_size, deque(), deque(), 0, 0\n        t_ap, p_ap = targets.append, path.appendleft\n\n        while l < r:\n            if l & 1:\n                t_ap(l)\n                p_l = p_l or l >> 1\n                l += 1\n            if r & 1:\n                r -= 1\n                t_ap(r)\n                p_r = p_r or r >> 1\n            l >>= 1\n            r >>= 1\n\n        deepest = (p_l, p_r)\n\n        while p_l > 1 or p_r > 1:\n            if p_r != p_l > 1:\n                p_ap(p_l)\n            p_l >>= 1\n            if p_r > 1:\n                p_ap(p_r)\n                p_r >>= 1\n\n        #print(targets, path)\n        return targets, path, deepest\n\n    def propagate(self, indexes: list, value: int = None):\n        tree, lazy, elem_size = self.tree, self.lazy, self.elem_size\n        if value is None:\n            for n in indexes:\n                if lazy[n] is None:\n                    continue\n                tree[n] = lazy[n]\n                if n < elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = lazy[n]\n                lazy[n] = None\n        else:\n            for n in indexes:\n                if n < elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = value\n                tree[n] = value\n                lazy[n] = None\n\n    def update_lazy(self, l, r, value):\n        targets, paths, deepest = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets, value)\n        self.update_tree(deepest)\n\n    def get_value(self, l: int, r: int):\n        tree = self.tree\n        targets, paths, deepest = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets)\n        self.update_tree(deepest)\n\n        # ===== change me =====\n        return min(tree[n] for n in targets)\n\n    def update_tree(self, indexes: tuple):\n        ''' ????????????lazy?????¨????????¬????????§???????????¨???????????¨???????????? '''\n\n        tree, lazy = self.tree, self.lazy\n\n        for k in indexes:\n            #if k >= self.elem_size:\n            #    k >>= 1\n\n            while k > 0:\n                left, right = k << 1, (k << 1)+1\n                # ===== change me =====\n                if lazy[left] is not None:\n                    tree[left] = lazy[left]\n                if lazy[right] is not None:\n                    tree[right] = lazy[right]\n                tree[k] = tree[left] if tree[left] < tree[right] else tree[right]\n\n                k >>= 1\n\n    def set_value(self, i: int, value: int, op: str):\n        k = self.elem_size + i\n        if op == \"=\":\n            self.tree[k] = value\n        elif op == \"+\":\n            self.tree[k] += value\n        self.update_tree(k)\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.update_lazy(l[1], l[2]+1, l[3])\n    else:\n        a = rmq.get_value(l[1], l[2]+1)\n        append(a)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "INT_MAX = (1<<31) - 1\n_N,query_num = map(int, input().split())\nqueries = [list(map(int, input().split())) for i in range(query_num)]\nN = 1<<17\n\narr_size = 2*N - 1\nA = [INT_MAX]*(arr_size)\nlazy_A = [None]*(arr_size)\n\ndef tree_propagate(k):\n    if(lazy_A[k] is None):\n        return\n    if(k < N // 2):\n        A[k*2+1] = A[k*2+2] = lazy_A[k*2+1] = lazy_A[k*2+2] = lazy_A[k]\n        lazy_A[k] = None\n        return\n    if(k < N-1):\n        A[k*2+1] = A[k*2+2] = lazy_A[k]\n        lazy_A[k] = None\n\ndef update(s,t,x,k,l,r):\n    if (r <= s or t <= l):\n        return\n    if (s <= l and r <= t):\n        A[k] = x\n        if(k < N-1):\n            lazy_A[k] = x\n        return\n\n    tree_propagate(k)\n    center = (l+r)//2\n    update(s, t, x, k*2 + 1, l, center)\n    update(s, t, x, k*2 + 2, center, r)\n    A[k] = min(A[k*2+1], A[k*2+2])\n\ndef find(s,t,k,l,r):\n    if (r <= s or t <= l):\n        return INT_MAX\n    if(s <= l and r <= t):\n        return A[k]\n\n    tree_propagate(k)\n    center = (l+r)//2\n    v_left = find(s, t, k*2 + 1, l, center)\n    v_right = find(s, t, k*2 + 2, center, r)\n    return min(v_left,v_right)\n\nanswers = []\nfor query in queries:\n    if(query[0]==0):\n        update(query[1],query[2]+1,query[3],0,0,N)\n    else:\n        answers.append(find(query[1],query[2]+1,0,0,N))\n\nprint(\"\\n\".join([str(ans) for ans in answers]))\n\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.142118480518951,
+        "jaccard": 0.36885245901639346,
+        "tsed": 0.25522727272727286,
+        "cged": 0.0,
+        "codebleu": 0.2046291024169483
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 5
+    },
+    {
+      "case": "p02350",
+      "src": {
+        "code": "import math\nfrom collections import deque\n\n\nclass SegmentTree:\n    __slots__ = [\"elem_size\", \"tree_size\", \"tree\", \"lazy\"]\n\n    def __init__(self, a: list, default: int):\n        real_size = len(a)\n        self.elem_size = 1 << math.ceil(math.log2(real_size))\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def get_indexes(self, l: int, r: int):\n        '''[x, y)'''\n        l, r, targets, path, p_l, p_r, = l+self.elem_size, r+self.elem_size, deque(), deque(), 0, 0\n        t_ap, p_ap = targets.append, path.appendleft\n\n        while l < r:\n            if l & 1:\n                t_ap(l)\n                p_l = p_l or l >> 1\n                l += 1\n            if r & 1:\n                r -= 1\n                t_ap(r)\n                p_r = p_r or r >> 1\n            l, r = l >> 1, r >> 1\n\n        deepest = (p_l, p_r)\n\n        while p_l > 1 or p_r > 1:\n            if p_l > 1:\n                p_ap(p_l)\n            if p_l != p_r > 1:\n                p_ap(p_r)\n            p_l >>= 1\n            p_r >>= 1\n\n        #print(targets, path)\n        return targets, path, deepest\n\n    def propagate(self, indexes: list, value: int = None):\n        tree, lazy, elem_size = self.tree, self.lazy, self.elem_size\n        if value is None:\n            for n in indexes:\n                if lazy[n] is None:\n                    continue\n                tree[n] = lazy[n]\n                if n < elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = lazy[n]\n                lazy[n] = None\n        else:\n            for n in indexes:\n                if n < elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = value\n                tree[n] = value\n                lazy[n] = None\n\n    def get_indexes_with_propagation(self, l: int, r: int, current_node: int, l_end: int, r_end: int):\n        # print(l,r,current_node,l_end,r_end,self.lazy[current_node])\n        indexes = []\n        tree, lazy = self.tree, self.lazy\n        lazy_value, lazy[current_node] = lazy[current_node], None\n        left_child, right_child = current_node << 1, (current_node << 1) + 1\n\n        if lazy_value is not None:\n            tree[current_node] = lazy_value\n            if left_child < self.tree_size:\n                lazy[left_child] = lazy[right_child] = lazy_value\n\n        if l == l_end and r == r_end:\n            return [current_node]\n\n        mid = (l_end + r_end) // 2\n\n        if l < mid:\n            l_r = r if r < mid else mid\n            indexes += self.get_indexes_with_propagation(l, l_r, left_child, l_end, mid)\n        if r > mid:\n            r_l = l if mid < l else mid\n            indexes += self.get_indexes_with_propagation(r_l, r, right_child, mid, r_end)\n\n        return indexes\n\n    def update_lazy(self, l, r, value):\n        '''\n        indexes = sorted(self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size))\n        l = self.elem_size\n        lazy, tree, update = self.lazy, self.tree, self.update_tree\n        for n in indexes:\n            lazy[n] = None\n            if n < l:\n                lazy[n << 1] = value\n                lazy[(n << 1)+1] = value\n            tree[n] = value\n            update(n)\n        print(\"update_lazy\",indexes)\n        '''\n        targets, paths, deepest = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets, value)\n        self.update_tree(deepest[0])\n        self.update_tree(deepest[1])\n\n    def get_value(self, l: int, r: int):\n        '''\n        tree = self.tree\n        indexes = self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size)\n        update = self.update_tree\n        for n in indexes:\n            update(n)\n        '''\n        tree = self.tree\n        targets, paths, deepest = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets)\n        self.update_tree(deepest[0])\n        self.update_tree(deepest[1])\n\n        # ===== change me =====\n        #print([(n,tree[n]) for n in indexes])\n        return min(tree[n] for n in targets)\n\n    def update_tree(self, k: int):\n        tree, lazy = self.tree, self.lazy\n        if k >= self.elem_size:\n            k >>= 1\n\n        while k > 0:\n            left, right = k << 1, (k << 1)+1\n            if lazy[k] is None:\n                if lazy[left] is not None:\n                    tree[left] = lazy[left]\n                if lazy[right] is not None:\n                    tree[right] = lazy[right]\n                tree[k] = tree[left] if tree[left] < tree[right] else tree[right]\n            else:\n                tree[left] = tree[right] = tree[k] = lazy[k]\n                lazy[left] = lazy[right] = lazy[k] = None\n            # ===== change me =====\n\n            k >>= 1\n\n    def set_value(self, i: int, value: int, op: str):\n        k = self.elem_size + i\n        if op == \"=\":\n            self.tree[k] = value\n        elif op == \"+\":\n            self.tree[k] += value\n        self.update_tree(k)\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.update_lazy(l[1], l[2]+1, l[3])\n        #print(rmq.get_indexes(l[1],l[2]+1))\n    else:\n        a = rmq.get_value(l[1], l[2]+1)\n        #print(rmq.get_indexes(l[1],l[2]+1))\n        append(a)\n    #print(rmq.tree,rmq.lazy)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import math\n\nlazy_default = None\n\ndef update_tree(k: int):\n    if k >= l:\n        k >>= 1\n    while k > 0:\n        left, right = tree[k << 1], tree[(k << 1) + 1]\n        # ===== change me =====\n        tree[k] = left if left < right else right\n        k >>= 1\n\ndef merge(node_index, value, update=False):\n    lazy_value = lazy[node_index]\n    # ===== change me =====\n    value = lazy_value if value is None else value\n    lazy[node_index] = None\n    # ===== change me =====\n    if value is not None:\n        tree[node_index] = value\n\n    if value is not None and node_index < l:\n        # ===== change me =====\n        if node_index < l // 2:\n            lazy[node_index << 1] = value\n            lazy[(node_index << 1) + 1] = value\n        else:\n            tree[node_index << 1] = value\n            tree[(node_index << 1) + 1] = value\n\n    if update:\n        if node_index >= l//2:\n            update_tree(node_index)\n        else:\n            update_tree(node_index >> 1)\n\ndef hoge(s, e, value):\n    s, e, d, l_active, r_active = s+l, e+l, rank, 1, 1\n    values = []\n    append = values.append\n\n    while l_active or r_active:\n        l_node, r_node = s >> d, e >> d\n        l_leaf = l_node << d, (l_node + 1 << d) - 1\n        r_leaf = r_node << d, (r_node + 1 << d) - 1\n        lazy_left, lazy_right = lazy[l_node], lazy[r_node]\n        #print(l_node,r_node,d,lazy_left,lazy_right,l_active,r_active)\n\n        if l_node == r_node:\n            if l_leaf[0] == s and r_leaf[1] == e:\n                # match\n                merge(l_node, value, True)\n                append(tree[l_node])\n                break\n            elif lazy_left is not None:\n                merge(l_node, None)\n        else:\n            if l_active:\n                if l_leaf[0] == s:\n                    # match\n                    merge(l_node, value, True)\n                    append(tree[l_node])\n                    l_active = 0\n                # ??????????????????????????????????????????????¶?????????????????????´???\n                else:\n                    if lazy_left is not None:\n                        merge(l_node, None)\n                    if l_node >> 1 << 1 == l_node and l_node+1 < r_node:\n                        # match\n                        merge(l_node+1, value)\n                        append(tree[l_node+1])\n\n            if r_active:\n                if r_leaf[1] == e:\n                    # match\n                    merge(r_node, value)\n                    update_tree(r_node)\n                    append(tree[r_node])\n                    r_active = 0\n                else:\n                    if lazy_right is not None:\n                        merge(r_node, None)\n                    if r_node >> 1 << 1 == r_node-1 and l_node+1 < r_node:\n                        # match\n                        merge(r_node-1, value)\n                        append(tree[r_node-1])\n        d -= 1\n    return values\n\ndef get_value(i):\n    i += l\n    v = 0\n    for j in range(rank, -1, -1):\n        v += lazy[i>>j]\n    return v + tree[i]\n\nn, q = map(int,input().split())\nl = 1 << math.ceil(math.log2(n))\ntree = [2**31-1]*(2*l)\nlazy = [None]*(2*l)\nrank = int(math.log2(l))\nans = []\nap = ans.append\n\nfor _ in [None]*q:\n    query = list(map(int, input().split()))\n    if query[0] == 0:\n        hoge(query[1], query[2], query[3])\n    else:\n        a = hoge(query[1], query[2], None)\n        ap(min(a))\nprint(\"\\n\".join((str(n) for n in ans)))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.23974983137838454,
+        "jaccard": 0.4892086330935252,
+        "tsed": 0.30150044130626635,
+        "cged": 0.0,
+        "codebleu": 0.25614159976224155
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 6
+    },
+    {
+      "case": "p02350",
+      "src": {
+        "code": "import math\nfrom collections import deque\n\n\nclass SegmentTree:\n    __slots__ = [\"rank\", \"elem_size\", \"tree_size\", \"tree\", \"lazy\", \"default_value\"]\n\n    def __init__(self, a: list, default: int):\n        self.default_value = default\n        real_size = len(a)\n        self.rank = math.ceil(math.log2(real_size))\n        self.elem_size = 1 << self.rank\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        # self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def process_query(self, l: int, r: int, value: int = None):\n        '''[x, y)'''\n        tree, lazy, elem_size, rank = self.tree, self.lazy, self.elem_size, self.rank-1\n        l, r, targets, p_l, p_r, l_rank, r_rank = l+elem_size, r+elem_size, deque(), 0, 0, 0, 0\n        t_ap = targets.append\n\n        while l < r:\n            if l & 1:\n                t_ap(l)\n                p_l = p_l or l >> 1\n                l_rank = l_rank or rank\n                l += 1\n            if r & 1:\n                r -= 1\n                t_ap(r)\n                p_r = p_r or r >> 1\n                r_rank = r_rank or rank\n            l >>= 1\n            r >>= 1\n            rank -= 1\n\n        deepest = (p_l, p_r)\n\n        paths = [[p_l >> n for n in range(l_rank-1, -1, -1)], [p_r >> n for n in range(r_rank-1, -1, -1)]]\n\n        for a in paths:\n            for i in a:\n                if lazy[i] is None:\n                    continue\n                # ===== change me =====\n                tree[i] = lazy[i]\n                if i < elem_size:\n                    lazy[i << 1] = lazy[i]\n                    lazy[(i << 1)+1] = lazy[i]\n                lazy[i] = None\n\n        result = self.default_value\n        for i in targets:\n            v = value if value is not None else lazy[i]\n            # ===== change me =====\n            if v is not None:\n                if i < elem_size:\n                    lazy[i << 1] = v\n                    lazy[(i << 1)+1] = v\n                tree[i] = v\n                lazy[i] = None\n            if result > tree[i]:\n                result = tree[i]\n\n        self.update_tree(deepest)\n\n        return result\n\n    def update_tree(self, indexes: tuple):\n        ''' ????????????lazy?????¨????????¬????????§???????????¨???????????¨???????????? '''\n\n        tree, lazy = self.tree, self.lazy\n\n        for k in indexes:\n            while k > 0:\n                left, right = k << 1, (k << 1)+1\n                # ===== change me =====\n                l_value = tree[left] if lazy[left] is None else lazy[left]\n                r_value = tree[right] if lazy[right] is None else lazy[right]\n                tree[k] = l_value if l_value < r_value else r_value\n\n                k >>= 1\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.process_query(l[1], l[2]+1, l[3])\n    else:\n        a = rmq.process_query(l[1], l[2]+1)\n        append(a)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import math\n\n\nclass SegmentTree:\n    __slots__ = [\"elem_size\", \"tree_size\", \"tree\", \"lazy\"]\n\n    def __init__(self, a: list, default: int):\n        real_size = len(a)\n        self.elem_size = 1 << math.ceil(math.log2(real_size))\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def get_indexes(self, l: int, r: int):\n        '''[x, y)'''\n        l, r, targets, path, p_l, p_r, = l+self.elem_size, r+self.elem_size, [], set(), 0, 0\n        t_ap, p_add = targets.append, path.add\n\n        while l < r:\n            if l & 1:\n                t_ap(l)\n                p_l = p_l or l >> 1\n                l += 1\n            if r & 1:\n                r -= 1\n                t_ap(r)\n                p_r = p_r or r >> 1\n            l, r = l >> 1, r >> 1\n\n        deepest = (p_l, p_r)\n\n        while p_l > 0 or p_r > 0:\n            if p_l > 0:\n                p_add(p_l)\n                p_l >>= 1\n            if p_r > 0:\n                p_add(p_r)\n                p_r >>= 1\n\n        #print(targets, path)\n        return sorted(targets), sorted(path), deepest\n\n    def propagate(self, indexes: list, value: int = None):\n        tree, lazy, elem_size = self.tree, self.lazy, self.elem_size\n        if value is None:\n            for n in indexes:\n                if lazy[n] is None:\n                    continue\n                tree[n] = lazy[n]\n                if n < elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = lazy[n]\n                lazy[n] = None\n        else:\n            for n in indexes:\n                if n < elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = value\n                tree[n] = value\n                lazy[n] = None\n\n    def get_indexes_with_propagation(self, l: int, r: int, current_node: int, l_end: int, r_end: int):\n        # print(l,r,current_node,l_end,r_end,self.lazy[current_node])\n        indexes = []\n        tree, lazy = self.tree, self.lazy\n        lazy_value, lazy[current_node] = lazy[current_node], None\n        left_child, right_child = current_node << 1, (current_node << 1) + 1\n\n        if lazy_value is not None:\n            tree[current_node] = lazy_value\n            if left_child < self.tree_size:\n                lazy[left_child] = lazy[right_child] = lazy_value\n\n        if l == l_end and r == r_end:\n            return [current_node]\n\n        mid = (l_end + r_end) // 2\n\n        if l < mid:\n            l_r = r if r < mid else mid\n            indexes += self.get_indexes_with_propagation(l, l_r, left_child, l_end, mid)\n        if r > mid:\n            r_l = l if mid < l else mid\n            indexes += self.get_indexes_with_propagation(r_l, r, right_child, mid, r_end)\n\n        return indexes\n\n    def update_lazy(self, l, r, value):\n        '''\n        indexes = sorted(self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size))\n        l = self.elem_size\n        lazy, tree, update = self.lazy, self.tree, self.update_tree\n        for n in indexes:\n            lazy[n] = None\n            if n < l:\n                lazy[n << 1] = value\n                lazy[(n << 1)+1] = value\n            tree[n] = value\n            update(n)\n        print(\"update_lazy\",indexes)\n        '''\n        targets, paths, deepest = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets, value)\n        self.update_tree(deepest[0])\n        self.update_tree(deepest[1])\n\n    def get_value(self, l: int, r: int):\n        '''\n        tree = self.tree\n        indexes = self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size)\n        update = self.update_tree\n        for n in indexes:\n            update(n)\n        '''\n        tree = self.tree\n        targets, paths, deepest = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets)\n        self.update_tree(deepest[0])\n        self.update_tree(deepest[1])\n\n        # ===== change me =====\n        #print([(n,tree[n]) for n in indexes])\n        return min(tree[n] for n in targets)\n\n    def update_tree(self, k: int):\n        tree, lazy = self.tree, self.lazy\n        if k >= self.elem_size:\n            k >>= 1\n\n        while k > 0:\n            left, right = k << 1, (k << 1)+1\n            if lazy[k] is None:\n                if lazy[left] is not None:\n                    tree[left] = lazy[left]\n                if lazy[right] is not None:\n                    tree[right] = lazy[right]\n                tree[k] = tree[left] if tree[left] < tree[right] else tree[right]\n            else:\n                tree[left] = tree[right] = tree[k] = lazy[k]\n                lazy[left] = lazy[right] = lazy[k] = None\n            # ===== change me =====\n\n            k >>= 1\n\n    def set_value(self, i: int, value: int, op: str):\n        k = self.elem_size + i\n        if op == \"=\":\n            self.tree[k] = value\n        elif op == \"+\":\n            self.tree[k] += value\n        self.update_tree(k)\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.update_lazy(l[1], l[2]+1, l[3])\n        #print(rmq.get_indexes(l[1],l[2]+1))\n    else:\n        a = rmq.get_value(l[1], l[2]+1)\n        #print(rmq.get_indexes(l[1],l[2]+1))\n        append(a)\n    #print(rmq.tree,rmq.lazy)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.35653223938591666,
+        "jaccard": 0.6854838709677419,
+        "tsed": 0.5402298850574704,
+        "cged": 0.0,
+        "codebleu": 0.3997090353767585
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 7
+    },
+    {
+      "case": "p02350",
+      "src": {
+        "code": "class LazyPropSegmentTree:\n    def __init__(self, lst, op, apply, comp, e, identity):\n        self.n = len(lst)\n        self.depth = (self.n - 1).bit_length()\n        self.N = 1 << self.depth\n        self.op = op # binary operation of elements\n        self.apply = apply # function to apply to an element\n        self.comp = comp # composition of functions\n        self.e = e # identity element w.r.t. op\n        self.identity = identity # identity element w.r.t. comp\n        self.v = self._build(lst) # self.v is set to be 1-indexed for simplicity\n        self.lazy = [self.identity] * (2 * self.N)\n    \n    def __getitem__(self, i):\n        return self.fold(i, i+1)\n    \n    def _build(self, lst):\n        # construction of a tree\n        # total 2 * self.N elements (tree[0] is not used)\n        tree = [self.e] * (self.N) + lst + [self.e] * (self.N - self.n)\n        for i in range(self.N - 1, 0, -1): tree[i] = self.op(tree[i << 1], tree[(i << 1)|1])\n        return tree\n    \n    def _indices(self, l, r):\n        left = l + self.N; right = r + self.N\n        left //= (left & (-left)); right //= (right & (-right))\n        left >>= 1; right >>= 1\n        while left != right:\n            if left > right: yield left; left >>= 1\n            else: yield right; right >>= 1\n        while left > 0: yield left; left >>= 1\n    \n    # propagate self.lazy and self.v in a top-down manner\n    def _propagate_topdown(self, *indices):\n        identity, v, lazy, apply, comp = self.identity, self.v, self.lazy, self.apply, self.comp\n        for k in reversed(indices):\n            x = lazy[k]\n            if x == identity: continue\n            lazy[k << 1] = comp(lazy[k << 1], x)\n            lazy[(k << 1)|1] = comp(lazy[(k << 1)|1], x)\n            v[k << 1] = apply(v[k << 1], x)\n            v[(k << 1)|1] = apply(v[(k << 1)|1], x)\n            lazy[k] = identity # propagated\n\n    # propagate self.v in a bottom-up manner\n    def _propagate_bottomup(self, indices):\n        v, op = self.v, self.op\n        for k in indices: v[k] = op(v[k << 1], v[(k << 1)|1])\n\n    # update for the query interval [l, r) with function x\n    def update(self, l, r, x):\n        *indices, = self._indices(l, r)\n        self._propagate_topdown(*indices)\n        \n        N, v, lazy, apply, comp = self.N, self.v, self.lazy, self.apply, self.comp\n        \n        # update self.v and self.lazy for the query interval [l, r)\n        left = l + N; right = r + N\n        if left & 1: v[left] = apply(v[left], x); left += 1\n        if right & 1: right -= 1; v[right] = apply(v[right], x)\n        left >>= 1; right >>= 1\n        while left < right:\n            if left & 1:\n                lazy[left] = comp(lazy[left], x)\n                v[left] = apply(v[left], x)\n                left += 1\n            if right & 1:\n                right -= 1\n                lazy[right] = comp(lazy[right], x)\n                v[right] = apply(v[right], x)\n            left >>= 1; right >>= 1\n        self._propagate_bottomup(indices)\n    \n    # returns answer for the query interval [l, r)\n    def fold(self, l, r):\n        self._propagate_topdown(*self._indices(l, r))\n        \n        e, N, v, op = self.e, self.N, self.v, self.op\n        \n        # calculate the answer for the query interval [l, r)\n        left = l + N; right = r + N\n        L = R = e\n        while left < right:\n            if left & 1: # self.v[left] is the right child\n                L = op(L, v[left])\n                left += 1\n            if right & 1: # self.v[right-1] is the left child\n                right -= 1\n                R = op(v[right], R)\n            left >>= 1; right >>= 1\n        return op(L, R)\n    \nN, Q = map(int, input().split())\nop = min\napply = lambda x, f: f\ncomp = lambda f, g: g\ne = 2**31 - 1\nidentity = None\nA = [e] * N\nlpsg = LazyPropSegmentTree(A, op, apply, comp, e, identity)\nans = []\nfor _ in range(Q):\n    t, *arg, = map(int, input().split())\n    if t == 0:\n        s, t, x = arg\n        lpsg.update(s, t+1, x)\n    else:\n        s, t = arg\n        ans.append(lpsg.fold(s, t+1))\nprint('\\n'.join(map(str, ans)))\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import math\n\n\nclass SegmentTree:\n    __slots__ = [\"elem_size\", \"tree_size\", \"tree\", \"lazy\"]\n\n    def __init__(self, a: list, default: int):\n        real_size = len(a)\n        self.elem_size = 1 << math.ceil(math.log2(real_size))\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def get_indexes(self, l: int, r: int):\n        '''[x, y)'''\n        l, r, targets, path, p_l, p_r, = l+self.elem_size, r+self.elem_size, [], set(), 0, 0\n        t_ap, p_add = targets.append, path.add\n\n        while l < r:\n            if l & 1:\n                t_ap(l)\n                p_l = p_l or l >> 1\n                l += 1\n            if r & 1:\n                r -= 1\n                t_ap(r)\n                p_r = p_r or r >> 1\n            l, r = l >> 1, r >> 1\n\n        while p_l > 0 or p_r > 0:\n            if p_l > 0:\n                p_add(p_l)\n                p_l >>= 1\n            if p_r > 0:\n                p_add(p_r)\n                p_r >>= 1\n\n        #print(targets, path)\n        return sorted(targets), sorted(path)\n\n    def propagate(self, indexes: list, value: int = None):\n        tree, lazy = self.tree, self.lazy\n        if value is None:\n            for n in indexes:\n                if lazy[n] is None:\n                    continue\n                tree[n] = lazy[n]\n                if n < self.elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = lazy[n]\n                lazy[n] = None\n        else:\n            for n in indexes:\n                if n < self.elem_size:\n                    lazy[n << 1] = lazy[(n << 1)+1] = value\n                tree[n] = value\n                lazy[n] = None\n                self.update_tree(n)\n\n    def get_indexes_with_propagation(self, l: int, r: int, current_node: int, l_end: int, r_end: int):\n        # print(l,r,current_node,l_end,r_end,self.lazy[current_node])\n        indexes = []\n        tree, lazy = self.tree, self.lazy\n        lazy_value, lazy[current_node] = lazy[current_node], None\n        left_child, right_child = current_node << 1, (current_node << 1) + 1\n\n        if lazy_value is not None:\n            tree[current_node] = lazy_value\n            if left_child < self.tree_size:\n                lazy[left_child] = lazy[right_child] = lazy_value\n\n        if l == l_end and r == r_end:\n            return [current_node]\n\n        mid = (l_end + r_end) // 2\n\n        if l < mid:\n            l_r = r if r < mid else mid\n            indexes += self.get_indexes_with_propagation(l, l_r, left_child, l_end, mid)\n        if r > mid:\n            r_l = l if mid < l else mid\n            indexes += self.get_indexes_with_propagation(r_l, r, right_child, mid, r_end)\n\n        return indexes\n\n    def update_lazy(self, l, r, value):\n        '''\n        indexes = sorted(self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size))\n        l = self.elem_size\n        lazy, tree, update = self.lazy, self.tree, self.update_tree\n        for n in indexes:\n            lazy[n] = None\n            if n < l:\n                lazy[n << 1] = value\n                lazy[(n << 1)+1] = value\n            tree[n] = value\n            update(n)\n        print(\"update_lazy\",indexes)\n        '''\n        targets, paths = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets, value)\n\n    def get_value(self, l: int, r: int):\n        '''\n        tree = self.tree\n        indexes = self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size)\n        update = self.update_tree\n        for n in indexes:\n            update(n)\n        '''\n        tree = self.tree\n        targets, paths = self.get_indexes(l, r)\n        self.propagate(paths)\n        self.propagate(targets)\n\n        # ===== change me =====\n        #print([(n,tree[n]) for n in indexes])\n        return min(tree[n] for n in targets)\n\n    def update_tree(self, k: int):\n        tree, lazy = self.tree, self.lazy\n        if k >= self.elem_size:\n            k >>= 1\n\n        while k > 0:\n            left, right = k << 1, (k << 1)+1\n            if lazy[k] is None:\n                if lazy[left] is not None:\n                    tree[left] = lazy[left]\n                if lazy[right] is not None:\n                    tree[right] = lazy[right]\n                tree[k] = tree[left] if tree[left] < tree[right] else tree[right]\n            else:\n                tree[left] = tree[right] = tree[k] = lazy[k]\n                lazy[left] = lazy[right] = lazy[k] = None\n            # ===== change me =====\n\n            k >>= 1\n\n    def set_value(self, i: int, value: int, op: str):\n        k = self.elem_size + i\n        if op == \"=\":\n            self.tree[k] = value\n        elif op == \"+\":\n            self.tree[k] += value\n        self.update_tree(k)\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.update_lazy(l[1], l[2]+1, l[3])\n        #print(rmq.get_indexes(l[1],l[2]+1))\n    else:\n        a = rmq.get_value(l[1], l[2]+1)\n        #print(rmq.get_indexes(l[1],l[2]+1))\n        append(a)\n    #print(rmq.tree,rmq.lazy)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.23187622316286177,
+        "jaccard": 0.367816091954023,
+        "tsed": 0.34309240622141146,
+        "cged": 0.0,
+        "codebleu": 0.19492842482826195
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 8
+    },
+    {
+      "case": "p02350",
+      "src": {
+        "code": "import math\n\n\nclass SegmentTree:\n    __slots__ = [\"rank\", \"elem_size\", \"tree_size\", \"tree\", \"lazy\", \"default_value\"]\n\n    def __init__(self, a: list, default: int):\n        self.default_value = default\n        real_size = len(a)\n        self.rank = math.ceil(math.log2(real_size))\n        self.elem_size = 1 << self.rank\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        # self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def process_query(self, l: int, r: int, value: int = None):\n        '''[x, y)'''\n        tree, lazy, elem_size, rank = self.tree, self.lazy, self.elem_size, self.rank-1\n        l, r, targets, p_l, p_r, l_rank, r_rank = l+elem_size, r+elem_size, [], 0, 0, 0, 0\n        t_ap = targets.append\n\n        while l < r:\n            if l & 1:\n                t_ap(l)\n                p_l = p_l or l >> 1\n                l_rank = l_rank or rank\n                l += 1\n            if r & 1:\n                r -= 1\n                t_ap(r)\n                p_r = p_r or r >> 1\n                r_rank = r_rank or rank\n            l >>= 1\n            r >>= 1\n            rank -= 1\n\n        deepest = (p_l, p_r)\n\n        paths = [[p_l >> n for n in range(l_rank-1, -1, -1)], [p_r >> n for n in range(r_rank-1, -1, -1)]]\n\n        for a in paths:\n            for i in a:\n                if lazy[i] is None:\n                    continue\n                # ===== change me =====\n                tree[i] = lazy[i]\n                if i < elem_size:\n                    lazy[i << 1] = lazy[i]\n                    lazy[(i << 1)+1] = lazy[i]\n                lazy[i] = None\n\n        result = self.default_value\n        for i in targets:\n            v = value if value is not None else lazy[i]\n            # ===== change me =====\n            if v is not None:\n                if i < elem_size:\n                    lazy[i << 1] = v\n                    lazy[(i << 1)+1] = v\n                tree[i] = v\n                lazy[i] = None\n            if result > tree[i]:\n                result = tree[i]\n\n        self.update_tree(deepest)\n\n        return result\n\n    def update_tree(self, indexes: tuple):\n        ''' ????????????lazy?????¨????????¬????????§???????????¨???????????¨???????????? '''\n\n        tree, lazy = self.tree, self.lazy\n\n        for k in indexes:\n            while k > 0:\n                left, right = k << 1, (k << 1)+1\n                # ===== change me =====\n                l_value = tree[left] if lazy[left] is None else lazy[left]\n                r_value = tree[right] if lazy[right] is None else lazy[right]\n                tree[k] = l_value if l_value < r_value else r_value\n\n                k >>= 1\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.process_query(l[1], l[2]+1, l[3])\n    else:\n        a = rmq.process_query(l[1], l[2]+1)\n        append(a)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import math\n\n\nclass SegmentTree:\n    __slots__ = [\"elem_size\", \"tree_size\", \"tree\", \"lazy\"]\n\n    def __init__(self, a: list, default: int):\n        real_size = len(a)\n        self.elem_size = 1 << math.ceil(math.log2(real_size))\n        self.tree_size = 2 * self.elem_size\n        self.tree = [default]*self.elem_size + a + [default]*(self.elem_size - real_size)\n        self.lazy = [None]*self.tree_size\n        self.init_tree()\n\n    def init_tree(self):\n        tree = self.tree\n        for i in range(self.elem_size-1, 0, -1):\n            left, right = tree[i << 1], tree[(i << 1)+1]\n            # ===== change me =====\n            tree[i] = left if left < right else right\n\n    def get_indexes(self, l: int, r: int):\n        '''[x, y)'''\n        l, r, indexes = l+self.elem_size, r+self.elem_size, []\n        append = indexes.append\n        while l < r:\n            if l & 1:\n                append(l)\n                l += 1\n            if r & 1:\n                r -= 1\n                append(r)\n            l, r = l >> 1, r >> 1\n\n        return indexes\n\n    def get_indexes_with_propagation(self, l: int, r: int, current_node: int, l_end: int, r_end: int):\n        # print(l,r,current_node,l_end,r_end,self.lazy[current_node])\n        indexes = []\n        tree, lazy = self.tree, self.lazy\n        lazy_value = lazy[current_node]\n        left_child, right_child = current_node << 1, (current_node << 1) + 1\n\n        if lazy_value is not None:\n            self.lazy[current_node] = None\n            tree[current_node] = lazy_value\n            if left_child < self.tree_size:\n                if left_child < self.elem_size:\n                    lazy[left_child] = lazy[right_child] = lazy_value\n                else:\n                    tree[left_child] = tree[right_child] = lazy_value\n\n        if l == l_end and r == r_end:\n            return [current_node]\n\n        mid = (l_end + r_end) // 2\n\n        if l < mid:\n            l_r = r if r < mid else mid\n            indexes += self.get_indexes_with_propagation(l, l_r, left_child, l_end, mid)\n\n        if r > mid:\n            r_l = l if mid < l else mid\n            indexes += self.get_indexes_with_propagation(r_l, r, right_child, mid, r_end)\n\n        return indexes\n\n    def update_lazy(self, l, r, value):\n        indexes = sorted(self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size))\n        l = self.elem_size\n        lazy, tree, update = self.lazy, self.tree, self.update_tree\n        for n in indexes:\n            lazy[n] = None\n            if n < l//2:\n                lazy[n << 1] = value\n                lazy[(n << 1)+1] = value\n            elif n < l:\n                tree[n << 1] = value\n                tree[(n << 1)+1] = value\n            tree[n] = value\n            update(n)\n\n    def get_value(self, l: int, r: int):\n        tree = self.tree\n        indexes = self.get_indexes_with_propagation(l, r, 1, 0, self.elem_size)\n        update = self.update_tree\n        for n in indexes:\n            update(n)\n\n        # ===== change me =====\n        return min(tree[n] for n in indexes)\n\n    def update_tree(self, k: int):\n        tree, lazy = self.tree, self.lazy\n        if k >= self.elem_size:\n            k >>= 1\n\n        while k > 0:\n            left, right = k << 1, (k << 1)+1\n            if lazy[k] is None:\n                if lazy[left] is not None:\n                    tree[left] = lazy[left]\n                if lazy[right] is not None:\n                    tree[right] = lazy[right]\n                tree[k] = tree[left] if tree[left] < tree[right] else tree[right]\n            else:\n                tree[left] = tree[right] = tree[k] = lazy[k]\n                lazy[left] = lazy[right] = lazy[k] = None\n            # ===== change me =====\n\n            k >>= 1\n\n    def set_value(self, i: int, value: int, op: str):\n        k = self.elem_size + i\n        if op == \"=\":\n            self.tree[k] = value\n        elif op == \"+\":\n            self.tree[k] += value\n        self.update_tree(k)\n\n\nn, q = map(int, input().split())\nrmq = SegmentTree([2**31-1]*n, 2**31-1)\nans = []\nappend = ans.append\nfor _ in [0]*q:\n    l = list(map(int, input().split()))\n    if l[0] == 0:\n        rmq.update_lazy(l[1], l[2]+1, l[3])\n    else:\n        a = rmq.get_value(l[1], l[2]+1)\n        append(a)\n\nprint(\"\\n\".join([str(n) for n in ans]))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.49649248098348225,
+        "jaccard": 0.6637931034482759,
+        "tsed": 0.5591836734693871,
+        "cged": 0.0,
+        "codebleu": 0.42327004809556884
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 9
+    },
+    {
+      "case": "1178_A",
+      "src": {
+        "code": "n = int(input())\nvotes = list(map(int,input().split()))\nalice = votes[0]\nalicep = alice\ncoalition = [0]\npossible =False\nnet = 0\nfor i in range (0,n):\n    net +=votes[i]\n\nfor i in range (1,n):\n    #print(alicep)\n    \n    if(votes[i]*2<=alice):\n        alicep+=votes[i]\n        coalition.append(i)\n    if(alicep>net/2):\n        print(len(coalition))\n        for j in coalition:\n            print(j+1,end=\" \")\n        possible = True\n        break\n    \nif(not possible):\n    print(0)\n    ",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n=int(input())\na=list(map(int,input().split()))\nalice=0\nif a[0] < sum(a[1:]):\n    if a[0] >= min(a[1:])*2:\n        c=[1]\n        alice=a[0]\n        s=sum(a[1:])\n        for i in range(1,n):\n            if a[0] >= a[i]*2 and a[0]<= s:\n                s=s-a[i]\n                alice+=a[i]\n                c.append(i+1)\n        if alice >= sum(a[0:])//2:\n            print(len(c))\n            print(*c)\n        else:\n            print(0)\n    else:\n        print(0)\nelif a[0]==sum(a[1:]):\n    if a[0] >= min(a[1:])*2:\n        c=[1]\n        s=sum(a[1:])\n        for i in range(1,n):\n            if a[0]>=a[i]*2 and a[0] <= s:\n                s=s-a[i]\n                c.append(i+1)\n        #print(len(c))\n        #print(*c)\n        if alice >= sum(a[0:])//2:\n            print(len(c))\n            print(*c)\n        else:\n            print(0)\n    else:\n        print(0)\nelif a[0] > sum(a[1:]):\n    print(1)\n    print(1)\n    \n    \n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.1139972243820845,
+        "jaccard": 0.6153846153846154,
+        "tsed": 0.4412500000000004,
+        "cged": 0.44855967078189296,
+        "codebleu": 0.20301452674332415
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 0
+    },
+    {
+      "case": "1178_A",
+      "src": {
+        "code": "# your code goes here\n\ndef test():\n\tn = int(input().strip())\n\tarr = input()\n\tarr = [int(x) for x in  arr.strip().split(\" \")]\n\t\n\ttotal = 0\n\tfor i in arr:\n\t\ttotal+=i\n\t\n\tmaj = int(total/2) + 1\n\tif arr[0] >= maj:\n\t\tprint(\"1\")\n\t\tprint(\"1\")\n\t\treturn\n\telse:\n\t\tgathered = arr[0]\n\t\tteam = [1]\n\t\tfor i in range(1, n):\n\t\t\tif arr[0] >= 2*arr[i]:\n\t\t\t\tgathered = gathered + arr[i]\n\t\t\t\tteam.append(i+1)\n\t\t\t\tif gathered >= maj:\n\t\t\t\t\tprint(len(team))\n\t\t\t\t\tprint(*team)\n\t\t\t\t\treturn\n\t\tprint(\"0\")\n\treturn\n\t\n\nif __name__ == \"__main__\":\n\ttest()",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n=int(input())\nslist=list(map(int,input().split()))\ntotal=sum(slist)\ns=slist[0]\nmlist=[]\nfor i in range(0,len(slist)):\n    if(slist[i]<=(slist[0]//2)):\n        s=s+slist[i]\n        mlist.append(i)\nif(s>(total//2)):\n    mlist.insert(0,1)\n    mlist=list(set(mlist))\n    print(len(mlist))\n    for i in range(0,len(mlist)):\n        print(mlist[i],end=\" \")\nelse:\n    print(0)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.23919131777769387,
+        "jaccard": 0.509090909090909,
+        "tsed": 0.33729729729729735,
+        "cged": 0.2899786780383795,
+        "codebleu": 0.22480471081413417
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 1
+    },
+    {
+      "case": "1178_A",
+      "src": {
+        "code": "n=int(input())\nseats=[]\n\nseats = map(int,input().split())\nslist = list(seats)\n# print (slist)\n# slist[1:].sort()\nalliance = slist[0]\nalist = []\nalist.append(0)\nflg = 0\nfor i in range(1,n):\n\tif slist[0] >= 2*slist[i]:\n\t\talliance+=slist[i]\n\t\talist.append(i)\n\nif (alliance > sum(slist)/2):\n\tprint (len(alist))\n\tfor i in range(len(alist)):\n\t\tif i == len(alist)-1:\n\t\t\tprint (alist[i]+1) \n\t\telse:\n\t\t\tprint (alist[i]+1, end = ' ') \nelse:\n\tprint (\"0\")\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n=int(input())\nl=list(map(int,input().split()))\nt=sum(l)//2\nid=[]\nid.append(1)\nr=l[0]//2\ns=l[0]\nif l[0]>t:\n    print(1)\n    print(1)\nelse:\n    for i in range(1,n):\n        if(l[i]<=r):\n            s+=l[i]\n            id.append(i+1)\n            if(s>t):\n                break\n    if(len(id)==1):\n        print(0)\n    else:    \n        print(len(id))\n        print(*id) \n    \n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.3630678046422114,
+        "jaccard": 0.6595744680851063,
+        "tsed": 0.41212121212121255,
+        "cged": 0.5416666666666667,
+        "codebleu": 0.2820823315307844
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 2
+    },
+    {
+      "case": "1178_A",
+      "src": {
+        "code": "n = int(input())\nsum ,psum = 0,0\na = list(map(int,input().split()) )\nfor it in a :\n\tsum += it\nk = a[0]\npsum = k\nidx = []\n# idx.insert(0,len(idx)-1)\nidx.append(0)\nfor i in range(1,n):\n\tif(2*a[i]<=k):\n\t\tpsum += a[i]\n\t\t# idx.insert(i,len(idx)-1)\n\t\tidx.append(i)\n\nif(psum > sum//2):\n\tprint (len(idx))\n\tfor i in range(len(idx)):\n\t\tprint(idx[i]+1,end=\" \")\t\t\nelse :\n\tprint(\"0\")\t\t",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def func(n, summ, numberofpart, part, maj):\n\tif n==numb-1:\n\t\tprint(0)\n\t\texit()\n\tfor p in range(n+1, numb):\n\t\tif part[p]<=part[0]//2:\n\t\t\tsumm+=part[p]\n\t\t\tif summ>=maj//2+1:\n\t\t\t\tnumberofpart.append(p)\n\t\t\t\tprint(len(numberofpart))\n\t\t\t\tfor z in numberofpart:\n\t\t\t\t\tprint(z+1, end = ' ')\n\t\t\t\texit()\n\t\t\telse:\n\t\t\t\tfunc(p,summ,numberofpart, part, maj)\n\t\telif p == numb-1:\n\t\t\tprint(0)\n\t\t\texit()\n\t\t\nnumb = int(input())\np = input()\nitem = p.split()\t\npart = [int(a) for a in item]\nmaj = 0 \nfor i in part:\n\tmaj +=i\nif part[0] >= maj//2+1:\n\tprint(1)\n\tprint(1)\n\texit()\nz=1\nfor i in range(numb):\n\tif part[0]>=part[i]*2:\n\t\tz+=1\nif z==1:\n\tprint(0)\n\texit()\n\nfor i in range(1, numb):\n\tif part[i]<=part[0]//2:\n\t\tsumm = part[0] + part[i]\n\t\tnumberofpart = [0, i]\n\t\tif summ>=maj//2+1:\n\t\t\tprint (2)\n\t\t\tprint(1, i+1)\n\t\t\texit()\n\t\telse:\n\t\t\tfunc(i, summ, numberofpart, part, maj)\n\n\n\t\t\n\t\t\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.12744700869118922,
+        "jaccard": 0.6037735849056604,
+        "tsed": 0.29480519480519346,
+        "cged": 0.3086053412462908,
+        "codebleu": 0.16069094956882063
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 3
+    },
+    {
+      "case": "1178_A",
+      "src": {
+        "code": "n = int(input())\nnums = input()\nnums1_list = list(map(int, nums.split(' ')))\nsum1 = sum(nums1_list)\ninds_list = [1]\nnums2_list = [nums1_list[0]]\nfor i in range(1, len(nums1_list)):\n    if nums1_list[0] >= (nums1_list[i] * 2) :\n        nums2_list.append(nums1_list[i])\n        inds_list.append(i+1)\n    if sum(nums2_list) > (sum1 / 2) :\n        break\ninds1_list = list(map(str, inds_list))\nif sum(nums2_list) > (sum1 / 2) :\n    print(len(inds_list))\n    print(' '.join(inds1_list))\nelse:\n    print(0)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n=int(input())\nslist=list(map(int,input().split()))\ntotal=sum(slist)\ns=slist[0]\nmlist=[]\nfor i in range(0,len(slist)):\n    if(slist[i]<=(slist[0]//2)):\n        s=s+slist[i]\n        mlist.append(i)\nif(s>(total//2)):\n    mlist.insert(0,1)\n    print(len(mlist))\n    for i in range(0,len(mlist)):\n        print(mlist[i],end=\" \")\nelse:\n    print(0)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.3500745877661634,
+        "jaccard": 0.6382978723404256,
+        "tsed": 0.5936305732484076,
+        "cged": 0.5794871794871794,
+        "codebleu": 0.2559813184899407
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 4
+    },
+    {
+      "case": "1178_A",
+      "src": {
+        "code": "n = int(input())\n\nline = input().split()\n\nv = [int(x) for x in line]\n\nsum = 0\n\nfor x in v:\n    sum += x\n\nidx = []\ns = 0\n\ns += v[0]\nidx.append(0)\n\nfor i in range(1, n):\n    if v[0] >= 2 * v[i]:\n        s += v[i]\n        idx.append(i)\n\nhalf = sum // 2 + 1\n\nif s >= half:\n    print(len(idx))\n    for i in range(len(idx)):\n        if(i == len(idx) - 1):\n            print(str(idx[i] + 1))\n        else:\n            print(str(idx[i] + 1), end = \" \")\nelse:\n    print(0)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n=int(input())\na=list(map(int,input().strip().split()))\nt=sum(a)\nmaj=(t//2)+1\nif(a[0]>=maj):\n    print(\"1\\n1\")\n    exit(0)\nx=a[0]\nop=[1]\nfor i in range(len(a)):\n    if(a[0]>=2*a[i]):\n        x+=a[i]\n        op.append(i+1)\nif(x>=maj):\n    print(len(op))\n    print(\" \".join(list(map(str,op))))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.2847167831592865,
+        "jaccard": 0.6122448979591837,
+        "tsed": 0.4112994350282487,
+        "cged": 0.44978165938864634,
+        "codebleu": 0.23006631417008783
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 5
+    },
+    {
+      "case": "1178_A",
+      "src": {
+        "code": "n=int(input())\nl=list(map(int,input().split()))\ns=sum(l);s=s//2;s+=1\na=l[0]\nind=[1]\nif l[0]>=s:\n    print(1)\n    print(1)\nelse:\n    for i in range(1,len(l)):\n        if l[0]>=(2*l[i]):\n            a+=l[i]\n            ind.append(i+1)\n    if a>=s:\n        print(len(ind))\n        for w in ind:\n            print(w,end=\" \")\n    else:\n        print(0)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def sum(a):\n    s=0\n    for i in a:\n        s=s+i\n    return s\nn=int(input())\na=list(map(int,input().split()))\nx=sum(a)\nif a[0]>=x//2+1:\n    print(1)\n    print(1)\nelse:\n    z=[1]\n    s=a[0]\n    for i in range(1,len(a)):\n        if a[0]//2>=a[i]:\n            z.append(i+1)\n            s=s+a[i]\n            a[i]=0\n    a[0]=0\n    if len(z)==1 or sum(a)>s:\n        print(0)\n    else:\n        print(len(z))\n        for i in z:\n            print(i,end=\" \")\n\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.4337554921847001,
+        "jaccard": 0.7674418604651163,
+        "tsed": 0.5318918918918922,
+        "cged": 0.5550847457627119,
+        "codebleu": 0.2506088578843588
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 6
+    },
+    {
+      "case": "1178_A",
+      "src": {
+        "code": "n = int(input())\na = [int(x) for x in input().split(' ')]\ns = sum(a)\nif a[0] > s/2:\n\tprint('1\\n1')\n\texit(0)\nans = '1'\nc = a[0]\nnum = 1\nfor i in range(1,len(a)):\n\tif a[i] <= a[0]/2:\n\t\tc += a[i]\n\t\tans += ' '+str(i+1)\n\t\tnum += 1\n\t\tif c > s/2:\n\t\t\tbreak\n\nif c > s/2:\n\tprint(num)\n\tprint(ans)\nelse:\n\tprint(0)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "from math import ceil, floor, gcd, fabs, factorial, fmod, sqrt, inf\nimport math\ndef sp(): return map(int, input().split())\ndef fun(x):\n    return sum(int(i) for i in str(x))\n# t=int(input())\nt=1\nfor _ in range(t):\n    n=int(input())\n    l=list(sp())\n    s=sum(l)\n    k=l[0]\n    dup=[]\n    for i in range(n):\n        dup.append(l[i])\n    # print(*dup)\n    l=l[1:]\n    l.sort(reverse=False)\n    if(k>s//2):print(1);print(1)\n    else:\n        i=0;\n        ans=[];ans.append(k);\n        while(k<=s//2 and i<n-2):\n            if(ans[0]>=2*l[i]):\n                k+=l[i]\n                ans.append(l[i])\n                # print(k,s)\n                i+=1;\n            else:\n                print(0);exit(0);\n        print(i+1)\n        # print(*ans)\n        for x in range(i+1):  \n            for j in range(n):\n                if(dup[j]==ans[x]):\n                    print(j+1, end=\" \")\n                    dup[j]=-1\n                    break;",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.10833237649355862,
+        "jaccard": 0.4520547945205479,
+        "tsed": 0.34475524475524366,
+        "cged": 0.3914373088685015,
+        "codebleu": 0.18477036710371392
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 7
+    },
+    {
+      "case": "1178_A",
+      "src": {
+        "code": "n=int(input())\nmas=list(map(int,input().split()))\nal=mas[0]\nskob=al\nskal=al\nans=[1]\n\nfor i in range(1,n):\n    if mas[i]<=al//2:\n        ans.append(i+1)\n        skob+=mas[i]\n        skal+=mas[i]\n    else:\n        skob+=mas[i]\nif skal*2>skob:\n    print(len(ans))\n    print(*ans)\nelse:\n    print(0)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n = int(input())\n\n\na = []\n\nparties = [1]\nfor x in map(int,input().split()):\n    a.append(x)\nnow = a[0]\n\ntotal = sum(a)\n\n\nfor i in range (1,n):\n\n    if now > total:\n      \n        break\n\n    elif a[0]//2>=a[i]:\n        now += a[i]\n        parties.append(i+1)\n        \n\nif now > total//2:        \n    for _ in range (0,len(parties)):\n\n        print(parties[_],end=\" \")\nelse:\n    print(0)\n    \n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.3923898469074227,
+        "jaccard": 0.6086956521739131,
+        "tsed": 0.5160305343511452,
+        "cged": 0.49307479224376727,
+        "codebleu": 0.23813434898683775
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 8
+    },
+    {
+      "case": "1178_A",
+      "src": {
+        "code": "n=int(input())\narr=list(map(int,input().split()))\nval=0\nfor i in range(n):\n    val=val+arr[i]\nval=(val//2)+1\nsumm=arr[0]\nmy_win=[]\ncount=0\nmy_win.append(str(1))\nfor i in range(1,n):\n    if summ>=val:\n        count+=1\n        break\n    else:\n        if arr[i]*2<=(arr[0]):\n            summ+=arr[i]\n            my_win.append(str(i+1))\n        else:\n            pass\nif summ>=val:\n    count+=1\nif count>0:\n    print(len(my_win))\n    for i in range(len(my_win)-1,-1,-1):\n        print(my_win[i],end=\" \")\nelse:\n    print(\"0\")",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n = int(input())\na = [int(i) for i in input().split()]\ntotal = sum(a)\nc1 = a[0]\nif c1/total > total/2:\n    print(1)\n    print(c1)\nelse:\n    c = [1]\n    sm = c1\n    for i in range(1, n):\n        if a[i] <= c1//2:\n            c.append(i+1)\n            sm += a[i]\n            if sum(c) > total/2:\n                break\n    if sm > total/2:\n        print(len(c))\n        for i in range(len(c)):\n            print(c[i], end=' ')\n    else:\n        print(0)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.3461434157680684,
+        "jaccard": 0.6382978723404256,
+        "tsed": 0.556476683937824,
+        "cged": 0.515625,
+        "codebleu": 0.268687104331262
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 9
+    },
+    {
+      "case": "13_A",
+      "src": {
+        "code": "'''\nCreated on May 10, 2016\n\n@author: Md. Rezwanul Haque\n'''\n\ndef gcd(x,y):\n    while(y):\n        x,y = y,x%y\n    return x\n'''def Sum(n,b):\n    res = 0\n    a = 0\n    while(n):\n        a = a%b\n        res += a \n        n/=b \n    return res'''\n\na = int(input())\nres =0\nfor i in range(2,a):\n    tmp = a \n    while(tmp):\n        res += tmp%i \n        tmp//=i\nk  = gcd(res, a-2)\n\nprint(res//k,(a-2)//k,sep = '/')\n        ",
+        "language": "python"
+      },
+      "dst": {
+        "code": "a = int(input())\ns= 0\nfor i in range(2,a):\n        d = a \n        while d!=0:\n                 s += d%i\n                 d = d//i \nprint(str(s)+\"/\"+str(a-2))\n\n\t\t \t\t \t \t\t \t     \t\t\t \t    \t \t\t",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.18323827438428844,
+        "jaccard": 0.425531914893617,
+        "tsed": 0.39999999999999997,
+        "cged": 0.4691358024691358,
+        "codebleu": 0.3310057988612244
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 0
+    },
+    {
+      "case": "13_A",
+      "src": {
+        "code": "from math import gcd\ndef TenToAny(a, b):\n\tres = 0\n\twhile a != 0:\n\t\tres+= a % b\n\t\ta//= b\n\treturn res\n\nA = int(input())\nans = 0\nfor i in range(2, A):\n\tans+= TenToAny(A, i)\nA-= 2\nY = gcd(A, ans)\n\nprint(str(ans//Y)+'/'+str(A//Y))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "from math import *\ndef from10(a, n):\n    if(a==0):\n        return 0\n    if(a==1):\n        return 1\n    k = log(a,n)\n    b = ceil(k)\n    if(b-k ==0):\n        b+=1\n    c = a//(n**(b-1))\n    #print(b)\n    return int(c)+from10(a-c*n**(b-1),n)\n#print(from10(4,2))\na = int(input())\nslog = 0\nsumm = 0\nfor i in range(2,a):\n    summ+=from10(a,i)\n    #print(summ)\nprint(summ//gcd(a-2,summ),(a-2)//(gcd(summ,a-2)),sep='/')",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.10639455383861385,
+        "jaccard": 0.5208333333333334,
+        "tsed": 0.44935064935064944,
+        "cged": 0.49582172701949856,
+        "codebleu": 0.2400302093648059
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 1
+    },
+    {
+      "case": "13_A",
+      "src": {
+        "code": "def gcd(a, b):\n    return a if b == 0 else gcd(b, a % b)\n\n\ndef sumOfBase(A, Base):\n    ans = 0\n    while (A > 0):\n        ans += A % Base\n        A //= Base\n    return ans\n\n\nA = int(input())\ncounter = 0\nfor i in range(2, A):\n    counter += sumOfBase(A, i)\nprint(str(int(counter / gcd(counter, A-2))) + \"/\" + str(int((A-2) / gcd(counter, A-2))),sep='')",
+        "language": "python"
+      },
+      "dst": {
+        "code": "a = int(input())\ns= 0\nfor i in range(2,a):\n        d = a \n        while d!=0:\n                 r = d%i\n                 s += r \n                 d = d//i \nprint(str(s)+\"/\"+str(a-2))\n \t \t\t\t\t    \t \t  \t\t   \t  \t \t\t\t\t\t",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.20116126507745585,
+        "jaccard": 0.5526315789473685,
+        "tsed": 0.3760000000000001,
+        "cged": 0.4722222222222222,
+        "codebleu": 0.301080202785853
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 2
+    },
+    {
+      "case": "13_A",
+      "src": {
+        "code": "import sys\nimport math\nimport itertools\nimport collections\n\n\ndef sieve(n):\n    if n < 2: return list()\n    prime = [True for _ in range(n + 1)]\n    p = 3\n    while p * p <= n:\n        if prime[p]:\n            for i in range(p * 2, n + 1, p):\n                prime[i] = False\n        p += 2\n    r = [2]\n    for p in range(3, n + 1, 2):\n        if prime[p]:\n            r.append(p)\n    return r\ndef divs(n, start=1):\n    r = []\n    for i in range(start, int(math.sqrt(n) + 1)):\n        if (n % i == 0):\n            if (n / i == i):\n                r.append(i)\n            else:\n                r.extend([i, n // i])\n    return r\ndef cdiv(n, k): return n // k + (n % k != 0)\ndef ii(): return int(input())\ndef mi(): return map(int, input().split())\ndef li(): return list(map(int, input().split()))\ndef lcm(a, b): return abs(a * b) // math.gcd(a, b)\ndef wr(arr): return ''.join(map(str, arr))\ndef revn(n): return str(n)[::-1]\ndef prime(n):\n    if n == 2: return True\n    if n % 2 == 0 or n <= 1: return False\n    sqr = int(math.sqrt(n)) + 1\n    for d in range(3, sqr, 2):\n        if n % d == 0: return False\n    return True\ndef convn(number, base):\n    newnumber = 0\n    while number > 0:\n        newnumber += number % base\n        number //= base\n    return newnumber\n\n\nn = ii()\ns = 0\nfor i in range(2, n):\n    s += convn(n, i)\nt = math.gcd(s, n - 2)\nprint('{0}/{1}'.format(s // t, (n - 2) // t))\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import sys\n#import itertools\n#import math\n\n#t = int(input())\nt = 1\n#sys.setrecursionlimit(100000)\n\ndef toOther(number, n):\n    res = []\n    if number<n:\n        return number\n    else:\n        while number >= n:\n            res.append(number%n)\n            number //= n\n            if number<n:\n                res.append(number)\n\n    return list(reversed(res))\n\nwhile t > 0:\n    #print(t)\n    n = int(input())\n    total = 0\n    d = n-2\n    for i in range(2, n):\n        x = toOther(n, i)\n        #print(f\"{n} в {i}-ой: {x}\")\n        total+=sum(x)\n\n    #print(f\"total = {total}\")\n    print(f\"{total}/{d}\")\n    t -= 1",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.09249356870604841,
+        "jaccard": 0.44565217391304346,
+        "tsed": 0.1981735159817352,
+        "cged": 0.4231884057971015,
+        "codebleu": 0.23837589345134214
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 3
+    },
+    {
+      "case": "13_A",
+      "src": {
+        "code": "import math \na = int(input())\ns = 0\nfor i in range(2, a):\n    t = a\n    while t != 0:\n        s += t%i;t //= i\nd = math.gcd(s, a-2)\nprint(str(s//d)+'/'+str((a-2)//d))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "#13A\nimport math\nA = int(input())\ntotal = 0\nfor i in range(2, A):\n    num = A\n    total += num%i\n    num=num/i\nd=A-2\ng = math.gcd(total, d)\nnr = total/g\ndnm = d/g\nprint(nr,\"/\",dnm)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.2830512721750369,
+        "jaccard": 0.6052631578947368,
+        "tsed": 0.5580246913580247,
+        "cged": 0.7161572052401747,
+        "codebleu": 0.3974196152622118
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 4
+    },
+    {
+      "case": "13_A",
+      "src": {
+        "code": "import math\nn= int(input())\njam = 0\nl = 0\ng = 0\nfor i in range(2, n) :\n    l=n\n    while (l != 0) :\n        jam = jam + (l%i)\n        l//=i\ng=math.gcd(jam,n-2)\nprint(f\"{jam//g}/{(n-2)//g}\")\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "#***************13A - Numbers***************#\n\nimport math\nimport os\nimport random\nimport re\nimport sys\nfrom itertools import *\n\ndef base(b,n):\n    ans = 0\n    f = n\n    while n>0:\n        ans += n%b\n        n //= b\n    n = f\n    return ans\n    \nx = int(input())\nden = x-2\nnum = 0\nfor i in range(2,x):\n    num += base(i,x)\nprint(num,end=\"\")\nprint(\"/\",end=\"\")\nprint(den,end=\"\")",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.14931647451735827,
+        "jaccard": 0.45098039215686275,
+        "tsed": 0.3032258064516139,
+        "cged": 0.5114503816793894,
+        "codebleu": 0.2154847320028538
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 5
+    },
+    {
+      "case": "13_A",
+      "src": {
+        "code": "from math import gcd\nn,s=int(input()),0\nfor i in range(2,n):\n  k=n\n  while k!=0:\n    s+=k%i\n    k//=i\np=gcd(s,n-2)\nprint(f'{s//p}/{(n-2)//p}')",
+        "language": "python"
+      },
+      "dst": {
+        "code": "from math import *\ndef from10(a, n):\n    if(a==0):\n        return 0\n    if(a==1):\n        return 1\n    k = log(a,n)\n    b = ceil(k)\n    if(b-k ==0):\n        b+=1\n    c = a//(n**(b-1))\n    #print(b)\n    return int(c)+from10(a-c*n**(b-1),n)\n#print(from10(4,2))\na = int(input())\nslog = 0\nsumm = 0\nfor i in range(2,a):\n    summ+=from10(a,i)\n    print(summ)\nprint(summ//gcd(a-2,summ),(a-2)//(gcd(summ,a-2)),sep='/')",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.08568953943976253,
+        "jaccard": 0.48936170212765956,
+        "tsed": 0.3582278481012668,
+        "cged": 0.3726708074534162,
+        "codebleu": 0.11739994378718753
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 6
+    },
+    {
+      "case": "13_A",
+      "src": {
+        "code": "\n\n\n\na = int(input())\n\nimport math\n\ng = 0\n\n\n\nfor k in range(2,a):\n    x=a\n    l=x%k\n    while x>1:\n        x=x//k\n        g+=x%k\n    g+=l\n\n\nu = math.gcd(g,a-2)\n\nprint(str(g//u)+'/'+str((a-2)//u))\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "#***************13A - Numbers***************#\n\nimport math\nimport os\nimport random\nimport re\nimport sys\nfrom itertools import *\n\ndef base(b,n):\n    ans = 0\n    f = n\n    while n>0:\n        ans += n%b\n        n //= b\n    n = f\n    return ans\n    \nx = int(input())\nden = x-2\nnum = 0\nfor i in range(2,x):\n    num += base(i,x)\nprint(num,end=\"\")\nprint(\"/\",end=\"\")\nprint(den,end=\"\")",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.10413676141635621,
+        "jaccard": 0.4230769230769231,
+        "tsed": 0.39193548387096827,
+        "cged": 0.5288135593220339,
+        "codebleu": 0.2287968504760425
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 7
+    },
+    {
+      "case": "13_A",
+      "src": {
+        "code": "from math import gcd\n\na = int(input())\n\np = 0\n\nfor k in range(2, a):\n\n  b = a\n\n  while b > 0:\n\n    p += b % k\n\n    b //= k\n\ng = gcd(p, a - 2)\n\nprint(\"%d/%d\" % (p // g, (a - 2) // g))",
+        "language": "python"
+      },
+      "dst": {
+        "code": "a = int(input())\ns= 0\nfor i in range(2,a):\n        d = a \n        while d!=0:\n                 s += d%i\n                 d = d//i \nprint(str(s)+\"/\"+str(a-2))\n\n\t\t \t\t \t \t\t \t     \t\t\t \t    \t \t\t",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.2952943684104389,
+        "jaccard": 0.6060606060606061,
+        "tsed": 0.6453333333333333,
+        "cged": 0.5700934579439252,
+        "codebleu": 0.23924824898162111
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 8
+    },
+    {
+      "case": "13_A",
+      "src": {
+        "code": "from math import gcd\n\nn = int(input())\ns = 0\nfor i in range(2, n):\n    copy = n\n    while copy > 0:\n        s += copy % i\n        copy //= i\n\na = s\nb = n - 2\ng = gcd(a, b)\nprint(f\"{a // g}/{b // g}\")\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "from math import *\n\nn = int(input())\nl = [0 for i in range(n - 2)]\n\nfor i in range(2, n):\n    m = n\n    \n    while m != 0:\n        l[i - 2] += m % i\n        m -= m % i\n        m //= i\n\nzbr = sum(l)\nk = 1\n\nfor i in range(1, ceil(sqrt(n - 2)) + 1):\n    if zbr % i == 0 and (n - 2) % i == 0:\n        k *= i\n\nprint('{}/{}'.format(zbr // k, (n - 2) // k))\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.15356089382395058,
+        "jaccard": 0.5102040816326531,
+        "tsed": 0.5567164179104479,
+        "cged": 0.4424242424242424,
+        "codebleu": 0.17748119097108134
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 9
+    },
+    {
+      "case": "p00158",
+      "src": {
+        "code": "while True:\n    n=int(input())\n    if n==0:\n        break\n    else:\n        a=0\n        while True:\n            if n==1:\n                print(a)\n                break\n            elif n%2==0:\n                n/=2\n                a+=1\n            else:\n                n*=3\n                n+=1\n                a+=1\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def f(n, t):\n    if n % 2 == 0:\n        n = int(n / 2)\n    else:\n        n = n * 3 + 1\n    t += 1\n    if n == 1:\n        return t\n    else:\n        return f(n, t)\n\n\nwhile True:\n    _n = int(input())\n    if _n == 0:\n        break\n    print(f(_n, 0))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.37611442107512477,
+        "jaccard": 0.7241379310344828,
+        "tsed": 0.20000000000000068,
+        "cged": 0.40718562874251496,
+        "codebleu": 0.13046564518780085
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 0
+    },
+    {
+      "case": "p00158",
+      "src": {
+        "code": "for i in range(50):\n    n = int(input())\n    \n    if n == 0:    break\n    \n    i = 0\n    while 1:\n        if n == 1:  break\n        if n % 2 == 0:\n            n = n / 2\n        else:\n            n = n*3 + 1\n        i += 1\n    \n    print(i)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def f(n, t):\n    if n % 2 == 0:\n        n = int(n / 2)\n    else:\n        n = n * 3 + 1\n    t += 1\n    if n == 1:\n        return t\n    else:\n        return f(n, t)\n\n\nwhile True:\n    _n = int(input())\n    if _n == 0:\n        break\n    print(_n if _n == 1 else f(_n, 0))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.40831649741267034,
+        "jaccard": 0.625,
+        "tsed": 0.30238095238095286,
+        "cged": 0.42056074766355145,
+        "codebleu": 0.27947073588822136
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 1
+    },
+    {
+      "case": "p00158",
+      "src": {
+        "code": "while 1:\n    n=int(input())\n    if not n:break\n    a=0\n    while n>1:\n        if n%2:\n            n=3*n+1\n        else:\n            n//=2\n        a+=1\n    print(a)\n        \n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def f(n, t):\n    if n % 2 == 0:\n        n = int(n / 2)\n    else:\n        n = n * 3 + 1\n    t += 1\n    if n == 1:\n        return t\n    else:\n        return f(n, t)\n\n\nwhile True:\n    _n = int(input())\n    if _n == 0:\n        break\n    print(_n if _n == 1 else f(_n, 0))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.18874264822050732,
+        "jaccard": 0.6666666666666666,
+        "tsed": 0.33333333333333404,
+        "cged": 0.3563218390804598,
+        "codebleu": 0.1391668529294635
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 2
+    },
+    {
+      "case": "p00158",
+      "src": {
+        "code": "def co(x):\n    m = 0\n    while True:\n        if x==1:\n            break\n        if x%2==0:\n            x = x//2\n            m+=1\n        else:\n            x = int(x*3+1)\n            m+=1\n    print(m)\nwhile True:\n    n = int(input())\n    if n==0:\n        break\n    co(n)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def f(n, t):\n    if n % 2 == 0:\n        n = int(n / 2)\n    else:\n        n = n * 3 + 1\n    t += 1\n    if n == 1:\n        return t\n    else:\n        return f(n, t)\n\n\nwhile True:\n    _n = int(input())\n    if _n == 0:\n        break\n    print(f(_n, 0))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.3880492497478206,
+        "jaccard": 0.7333333333333333,
+        "tsed": 0.49629629629629635,
+        "cged": 0.6458333333333333,
+        "codebleu": 0.2528556148128239
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 3
+    },
+    {
+      "case": "p00158",
+      "src": {
+        "code": "while True:\n    n = int(input())\n    ans = 0\n    if n == 0:\n        break\n    while n > 1:\n        ans += 1\n        if n % 2 == 0:\n            n = n/2\n        else:\n            n = 3 * n + 1\n    print(ans)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def f(n, t):\n    if n % 2 == 0:\n        n = int(n / 2)\n    else:\n        n = n * 3 + 1\n    t += 1\n    if n == 1:\n        return t\n    else:\n        return f(n, t)\n\n\nwhile True:\n    _n = int(input())\n    if _n == 0:\n        break\n    print(f(_n, 0))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.36797765159947493,
+        "jaccard": 0.7241379310344828,
+        "tsed": 0.2658227848101271,
+        "cged": 0.5202312138728324,
+        "codebleu": 0.3064397383834204
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 4
+    },
+    {
+      "case": "p00158",
+      "src": {
+        "code": "while True: \n  a = int(input()) \n  if a == 0: \n    break \n  count = 0 \n  while a != 1: \n    if a % 2 == 0: \n      a //= 2 \n      count += 1 \n    else: \n      a = (a * 3) + 1 \n      count += 1 \n  print(count) ",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def f(n, t):\n    if n % 2 == 0:\n        n = int(n / 2)\n    else:\n        n = n * 3 + 1\n    t += 1\n    if n == 1:\n        return t\n    else:\n        return f(n, t)\n\n\nwhile True:\n    _n = int(input())\n    if _n == 0:\n        break\n    print(f(_n, 0))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.2580316181138244,
+        "jaccard": 0.6666666666666666,
+        "tsed": 0.29367088607594993,
+        "cged": 0.4678362573099415,
+        "codebleu": 0.2103560081544398
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 5
+    },
+    {
+      "case": "p00158",
+      "src": {
+        "code": "#もし0のときは終了\n#if文で偶数のとき、奇数の時で分ける\n#結果が１になるまで繰り返し回数をカウント\n\nwhile True:\n    n = int(input())\n    count = 0\n    if n == 0:\n        break\n    while n != 1:\n        if n%2 == 0:\n            n = n/2\n            count += 1\n        else:\n            n = n * 3 + 1\n            count += 1\n    print(count)\n\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def f(n, t):\n    if n % 2 == 0:\n        n = int(n / 2)\n    else:\n        n = n * 3 + 1\n    t += 1\n    if n == 1:\n        return t\n    else:\n        return f(n, t)\n\n\nwhile True:\n    _n = int(input())\n    if _n == 0:\n        break\n    print(_n if _n == 1 else f(_n, 0))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.4004238478772384,
+        "jaccard": 0.6176470588235294,
+        "tsed": 0.2690476190476194,
+        "cged": 0.5,
+        "codebleu": 0.2849711299499966
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 6
+    },
+    {
+      "case": "p00158",
+      "src": {
+        "code": "while True:\n    n = int(input())\n    if n==0:\n        break\n    m = 0\n    while True:\n        if n==1:\n            break\n        if n % 2==0:\n            n = n / 2\n            m += 1\n        else:\n            n = n * 3 + 1\n            m += 1\n    print(m)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def f(n, t):\n    if n % 2 == 0:\n        n = int(n / 2)\n    else:\n        n = n * 3 + 1\n    t += 1\n    if n == 1:\n        return t\n    else:\n        return f(n, t)\n\n\nwhile True:\n    _n = int(input())\n    if _n == 0:\n        break\n    print(_n if _n == 1 else f(_n, 0))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.42005942619799386,
+        "jaccard": 0.75,
+        "tsed": 0.24047619047619118,
+        "cged": 0.5326086956521738,
+        "codebleu": 0.26770430291481834
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 7
+    },
+    {
+      "case": "p00158",
+      "src": {
+        "code": "def f(x,y):\n    if x==1:\n        return(y)\n    if x%2==0:\n        return(f(x/2,y+1))\n    else:\n        return(f(3*x+1,y+1))\n\nwhile True:\n    x=int(input().strip())\n    if x==0:\n        break\n    print(f(x,0))\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def f(n, t):\n    if n % 2 == 0:\n        n = int(n / 2)\n    else:\n        n = n * 3 + 1\n    t += 1\n    if n == 1:\n        return t\n    else:\n        return f(n, t)\n\n\nwhile True:\n    _n = int(input())\n    if _n == 0:\n        break\n    print(_n if _n == 1 else f(_n, 0))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.3588755679070659,
+        "jaccard": 0.7741935483870968,
+        "tsed": 0.4976190476190477,
+        "cged": 0.6311111111111112,
+        "codebleu": 0.19184947354995913
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 8
+    },
+    {
+      "case": "p00158",
+      "src": {
+        "code": "while True:\n    n = int(input())\n    if n == 0:\n        break\n    \n    ans = 0    \n    while n != 1:\n        \n        if n % 2 == 0:\n            n = n/2\n        else:\n            n = n*3+1\n        \n        ans += 1\n    \n    print(ans)\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "def f(n, t):\n    if n % 2 == 0:\n        n = int(n / 2)\n    else:\n        n = n * 3 + 1\n    t += 1\n    if n == 1:\n        return t\n    else:\n        return f(n, t)\n\n\nwhile True:\n    _n = int(input())\n    if _n == 0:\n        break\n    print(_n if _n == 1 else f(_n, 0))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.37192559050027585,
+        "jaccard": 0.7241379310344828,
+        "tsed": 0.3333333333333339,
+        "cged": 0.5027322404371585,
+        "codebleu": 0.2827941545355964
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 9
+    },
+    {
+      "case": "p03128",
+      "src": {
+        "code": "n,m,*a=map(int,open(0).read().split());c,d=[0,2,5,5,4,5,6,3,7,6],[0]*n*9\nfor i in range(n):\n for j in a:\n  if d[i]or i<1:d[i+c[j]]=max(d[i+c[j]],d[i]*10+j)\nprint(d[n])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "a,b = map(int,input().split())\nk = [2,5,5,4,5,6,3,7,6]\nc = list(map(int,input().split()))\ncc = [[0,0] for i in range(b)]\nccc = [[0,0] for i in range(b)]\nc.sort(reverse = True)\nfor i in range(b):\n\tcc[i] = [c[i],k[c[i]-1]]\n\tccc[i]= [c[i],k[c[i]-1]]\n\ncc.sort(key = lambda x:x[1])\nccc.sort(reverse = True)\np = a // cc[0][1]\nq = a % cc[0][1]\nco = [cc[0][0] for i in range(p)]\nfor i in range(p):\n\tfor j in range(b):\n\t\tif ccc[j][0] > cc[0][0] and q >= ccc[j][1] - cc[0][1]:\n\t\t\tco[i] = ccc[j][0]\n\t\t\tq -= ccc[j][1] - cc[0][1]\n\t\t\tbreak\n\tif q == 0:\n\t\tbreak\n\nfor i in range(p):\n\tfor j in range(b):\n\t\tif q >= cc[j][1] - k[co[-(i+1)]-1] and cc[j][1] > k[co[-(i+1)]-1]:\n\t\t\tq -= cc[j][1] - k[co[-(i+1)]-1]\n\t\t\tco[-(i+1)] = cc[j][0]\n\tif q == 0:\n\t\tbreak\nif q != 0:\n\tfor i in range(a):\n\t\tif c[0][1] != c[i][1]:\n\t\t\tp = a // cc[i][1]\n\t\t\tq = a % cc[i][1]\n\t\t\tco = [cc[i][0] for j in range(p)]\n\t\t\tfor i in range(p):\n\t\t\t\tfor j in range(b):\n\t\t\t\t\tif ccc[j][0] > cc[0][0] and q >= ccc[j][1] - cc[0][1]:\n\t\t\t\t\t\tco[i] = ccc[j][0]\n\t\t\t\t\t\tq -= ccc[j][1] - cc[0][1]\n\t\t\t\t\tbreak\n\t\t\t\tif q == 0:\n\t\t\t\t\tbreak\n\n\t\t\tfor i in range(p):\n\t\t\t\tfor j in range(b):\n\t\t\t\t\tif q >= cc[j][1] - k[co[-(i+1)]-1] and cc[j][1] > k[co[-(i+1)]-1]:\n\t\t\t\t\t\tq -= cc[j][1] - k[co[-(i+1)]-1]\n\t\t\t\t\t\tco[-(i+1)] = cc[j][0]\n\t\t\t\tif q == 0:\n\t\t\t\t\tbreak\n\n\t\t\tbreak\n\n\nco.sort(reverse = True)\n\nco = map(str,co)\naaa = ''.join(co)\nprint(aaa)\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.0027074440255222603,
+        "jaccard": 0.4393939393939394,
+        "tsed": 0.27462686567163813,
+        "cged": 0.19653179190751446,
+        "codebleu": 0.07736125349902087
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 0
+    },
+    {
+      "case": "p03128",
+      "src": {
+        "code": "n,m=map(int,input().split())\nA=list(map(int,input().split()))\nL=[0,2,5,5,4,5,6,3,7,6]\ndp=[0]+[-1]*n\nfor i in range(n+1):\n  for a in A:\n    if i+L[a]<=n:\n      dp[i+L[a]]=max(dp[i+L[a]],dp[i]*10+a)\nprint(dp[n])\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n,m=map(int, input().split())\nmt=[0,2,5,5,4,5,6,3,7,6]\na=sorted(map(int, input().split()))\ndp=['']*(n+1)\ndp[0]='*'\nfor i in range(n+1):\n    if not dp[i]:continue\n    for j in a:\n        if i+mt[j]<n+1:\n            dp[i+mt[j]]=dp[i]+str(j)\nprint(dp[-1][1:])",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.5858120601257041,
+        "jaccard": 0.7555555555555555,
+        "tsed": 0.5531250000000003,
+        "cged": 0.6341463414634146,
+        "codebleu": 0.3302399871564614
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 1
+    },
+    {
+      "case": "p03128",
+      "src": {
+        "code": "n,m=map(int, input().split())\nmt=[0,2,5,5,4,5,6,3,7,6]\na=sorted(map(int, input().split()))[::-1]\ndp=[-1]*(n+1)\ndp[0]=0\nfor i in range(n+1):\n    if dp[i]==-1:continue\n    for j in a:\n        if i+mt[j]<n+1:\n            dp[i+mt[j]]=max(dp[i]*10+j,dp[i+mt[j]])\nprint(dp[-1])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import sys\ninput=sys.stdin.readline\nn,m=map(int,input().split())\na=list(map(int,input().split()))\na.sort(reverse=True)\nnum=[0,2,5,5,4,5,6,3,7,6]\ninf=float(\"inf\")\ndp=[-1*inf]*(n+1)\ndp[0]=0\nfor i in range(1,n+1):\n    for j in range(m):\n        dp[i]=max(dp[i],dp[i-num[a[j]]]+1)\nans=[]\nfor i in range(dp[n]):\n    for j in range(m):\n        if dp[n-num[a[j]]]==dp[n]-1:\n            ans.append(a[j])\n            n-=num[a[j]]\n            break\nan=\"\"\nfor i in range(len(ans)):\n    an+=str(ans[i])\nprint(an)\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.4005615045314723,
+        "jaccard": 0.6140350877192983,
+        "tsed": 0.4298642533936658,
+        "cged": 0.4106776180698152,
+        "codebleu": 0.16802761074870148
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 2
+    },
+    {
+      "case": "p03128",
+      "src": {
+        "code": "n, m=map(int, input().split())\na=list(map(int, input().split()))\nd={1:2, 2:5, 3:5, 4:4, 5:5, 6:6, 7:3, 8:7, 9:6}\nmemo=[0]*(n+1)\nmemo[0]=0\nmemo[1]=-10**10\nfor i in range(2, n+1):\n    res=-10**10\n    for ai in a:\n        if d[ai]>i:\n            continue\n        res=max(res, ai+memo[i-d[ai]]*10)\n    memo[i]=res\nprint(memo[n])\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "N,M = map(int,(input().split()))\nA = list(map(int,input().split()))\ncost = sorted(list(zip([[2,5,5,4,5,6,3,7,6][a-1] for a in A],A)),key = lambda x: (x[0],-x[1]))\n\n#同じ画数の数字を除く\ntmp = len(cost)\ni = 1\nwhile i < tmp:\n    if cost[i][0] == cost[i-1][0]:\n        cost.pop(i)\n        tmp = len(cost)\n    else:\n        i += 1\n\nstack = [[1]+[0]*(len(cost)-1)]\nwhile stack:\n    ans_list = stack.pop()\n    tmp = 0\n    for i,n in enumerate(ans_list):\n        tmp += n * cost[i][0]\n    if tmp == N:\n        break\n    elif tmp < N:\n        tmp2 = len(ans_list)\n        for i in range(tmp2-1,-1,-1):\n            stack.append([a + (i == j) for j,a in enumerate(ans_list)])\n\nans_out = sorted(list(zip(cost,ans_list)),key = lambda x: -x[0][1])\n\nout_str = \"\"\nfor out in ans_out:\n    out_str += str(out[0][1])*out[1]\nprint(out_str)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.12524719004628182,
+        "jaccard": 0.43243243243243246,
+        "tsed": 0.3993079584775076,
+        "cged": 0.3775351014040562,
+        "codebleu": 0.14460844243737386
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 3
+    },
+    {
+      "case": "p03128",
+      "src": {
+        "code": "N, M = map(int, input().split())\nA = list(map(int, input().split()))\ndp = [-1] * (N + 1)\ndp[0] = 0\nmatch = [2, 5, 5, 4, 5, 6, 3, 7, 6]\nmn = []\nfor a in A:\n    mn.append([match[a-1],a])\nfor i in range(2, N+1):\n    for m, n in mn:\n        if i-m  >= 0:\n            dp[i] = max(dp[i],dp[i-m]*10+n)       \nprint(dp[-1])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "N,M=map(int,input().split())\n\nA=list(map(int,input().split()))\nA.sort(reverse=True)\nhonsuu=[0,2,5,5,4,5,6,3,7,6]\n\ndef ketadp(N,M,A):\n  dp=[0]*(N+1)\n  for i in range(N):\n    for j in A:\n      if (i+1-honsuu[j])==0 or (i+1-honsuu[j]>0 and dp[i+1-honsuu[j]]!=0):\n        dp[i+1]=max(dp[i+1],dp[i+1-honsuu[j]]+1)\n  return dp\n  \n\nans=\"\"\nketa=ketadp(N,M,A)\nremain=keta[N]\nmatch=N\n#print(A)\n\nwhile(match>0):\n  for i in A:\n    #print(i,match,remain,keta[match-honsuu[i]])\n    if(keta[match-honsuu[i]]==remain-1):\n      ans+=str(i)\n      remain-=1\n      match-=honsuu[i]\n      break;\nprint(ans)  ",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.2692226217693163,
+        "jaccard": 0.5967741935483871,
+        "tsed": 0.432432432432433,
+        "cged": 0.46153846153846156,
+        "codebleu": 0.18897016825930518
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 4
+    },
+    {
+      "case": "p03128",
+      "src": {
+        "code": "n,m=map(int,input().split())\ndp=[0]+[-(2**30) for i in range(n)]\na,b=sorted(list(map(int,input().split())),reverse=True),[0,2,5,5,4,5,6,3,7,6]\nfor i in range(n):\n\tfor j in range(m):\n\t\tif(i+b[a[j]]>n):\n\t\t\tcontinue\n\t\tdp[i+b[a[j]]] = max(dp[i+b[a[j]]],dp[i]+1)\nans = \"\"\nwhile n:\n\tfor j in range(m):\n\t\tif n-b[a[j]]<0:\n\t\t\tcontinue\n\t\tif dp[n-b[a[j]]] == dp[n]-1:\n\t\t\tans += str(a[j])\n\t\t\tn -= b[a[j]]\n\t\t\tbreak\nprint(ans)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "N, M = input().split()\nN = int(N)\nM = int(M)\n\nAlist = [int(x) for x in input().split()]\n\nmatchDict = {1:2, 2:5, 3:5, 4:4, 5:5, 6:6, 7:3, 8:7, 9:6}\n\nitems = {}\nfor a in Alist:\n    items[a] = matchDict[a]\n\n# 必要マッチ数の少ない順にソート\nitems = sorted(items.items(), key=lambda x: (x[1], -x[0]))\n\ncache = 0\ndelList = []\nfor k, v in items:\n    if cache == v:\n        delList.append((k,v))\n    else:\n        cache = v\nfor x in delList:\n    items.remove(x)\n\n# 何桁作る？\nmininum, mini = items[0]\nketa = N // mini\namari = N % mini\n\nresult = str(mininum) * keta\n# 余りに応じて数値調整\nif amari != 0:\n    items = sorted(items, key=lambda x: (x[0], x[1]))\n\n    for k,v in items:\n        if mininum == k:\n            continue\n        if v <= mini+amari:\n            if k > mininum:\n                result = result[:-1]\n                result = str(k) + result\n            elif mininum > k:\n                result = result[:-1] + str(k)\n            amari = amari - (v - mini)\n\n        if amari == 0:\n            break\n\nprint(result)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.09931563938477474,
+        "jaccard": 0.4125,
+        "tsed": 0.31999999999999945,
+        "cged": 0.4144645340751043,
+        "codebleu": 0.10691797783556065
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 5
+    },
+    {
+      "case": "p03128",
+      "src": {
+        "code": "n,m,*a=map(int,open(0).read().split())\nd=[0]*-~n\nfor i in range(1,n+1):\n for j,k in zip(range(9),(2,5,5,4,5,6,3,7,6)):\n  if i-k>=0and(i-k<1or d[i-k])and j+1in a:d[i]=max(d[i],d[i-k]*10+j+1)\nprint(d[n])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "# -*- coding: utf-8 -*-\ndef  inpl(): return list(map(int, input().split()))\nN, M = inpl()\nA = sorted(inpl())\ncost = [1e9, 2, 5, 5, 4, 5, 6, 3, 7, 6]\nucost = set([cost[a] for a in A])\n\nDP = [-1]*(N+1)\nDP[0] = 0\nfor a in A:\n    if cost[a] < N:\n        DP[cost[a]] = 1\n\nfor i in range(N):\n    if DP[i]:\n        v = DP[i]\n        for a in A:\n            c = cost[a]\n            if i + c > N:\n                break\n            DP[i+c] = max(DP[i+c], v+1)\nrA = A[::-1]\n\nt = N\nans = 0\nwhile t:\n    for a in rA:\n        if t - cost[a] < 0:\n            continue\n        if DP[t] == DP[t - cost[a]] + 1:\n            ans = 10*ans + a\n            t -= cost[a]\n            break\nprint(ans)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.1378254980698137,
+        "jaccard": 0.4520547945205479,
+        "tsed": 0.3103139013452922,
+        "cged": 0.404,
+        "codebleu": 0.07235586345727875
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 6
+    },
+    {
+      "case": "p03128",
+      "src": {
+        "code": "N,M=[int(x) for x in input().split()]\nX=[0,2,5,5,4,5,6,3,7,6]\n#    1,2,3,4,5,6,7,8,9\n\nA=[int(x) for x in input().split()]\n\n\n\nANS=[0]\nfor i in range(1,N+1):\n\tans=0\n\tfor j in A:\n\t\tif i==X[j]:\n\t\t\tans=max(j,ans)\n\t\telif i>=X[j]:\n\t\t\ttemp=ANS[i-X[j]]\n\t\t\tif temp!=0:\n\n\t\t\t\tans=max(ans,10*temp+j)\n\t\t\n\t\t#print(ans)\n\tANS.append(ans)\nprint(ANS[-1])\n\t\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n,m,*a=map(int,open(0).read().split())\nd=[0]*n*9\nfor i in range(n):d[i+1]=max(j+d[i-int('0144345265'[j])]*10for j in a)\nprint(d[n])",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.11416343314620499,
+        "jaccard": 0.41818181818181815,
+        "tsed": 0.2571428571428571,
+        "cged": 0.4685990338164251,
+        "codebleu": 0.1420243580691789
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 7
+    },
+    {
+      "case": "p03128",
+      "src": {
+        "code": "# D\nn,m = map(int, input().split())\nb = [0,2,5,5,4,5,6,3,7,6]\na = [0]+list(map(int, input().split()))\nf = [-1]*10010\nf[0]=0\nfor i in range(1,n+1):\n    for j in range(1,m+1):\n        x = a[j]\n        if(i-b[x]<0):\n            continue\n        f[i] = max(f[i],f[i-b[x]]*10 + x)\nprint(f[n])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "n,m = map(int,input().split())\na = list(map(int,input().split()))\na.sort()\nl = [0,2,5,5,4,5,6,3,7,6]\nINF = 10**18\ndp = [[[-INF]*2 for i in range(n+1)] for j in range(m+1)]\ndp[0][0] = [0,0]\nfor i in range(m):\n    for j in range(n+1):\n        x = l[a[i]]\n        dp[i+1][j] = dp[i][j]\n        if x <= j:\n            if dp[i+1][j-x][0] > -INF:\n                a1 = dp[i+1][j-x][0] +1\n                a2 = dp[i+1][j-x][1] + a[i]\n                if a1 > dp[i][j][0]:\n                    dp[i+1][j] = [a1,a2]\n                elif a1 == dp[i][j][0] and a2 > dp[i][j][1]:\n                    dp[i+1][j] = [a1,a2]\n\nans = []\nna = dp[-1][-1][0]\nnb = dp[-1][-1][1]\n\nfor i in range(m,0,-1):\n    for j in range(n,-1,-1):\n        x = l[a[i-1]]\n        if dp[i][j] == [na-1,nb-a[i-1]]:\n            na -= 1\n            nb -= a[i-1]\n            ans.append(a[i-1])\n\nans.sort(reverse = True)\nprint(*ans,sep=\"\")",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.09950578668096037,
+        "jaccard": 0.6065573770491803,
+        "tsed": 0.3497267759562842,
+        "cged": 0.3510971786833855,
+        "codebleu": 0.12320244399305769
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 8
+    },
+    {
+      "case": "p03128",
+      "src": {
+        "code": "n, m = map(int, input().split())\na = list(map(int, input().split()))\nc = [0, 2, 5, 5, 4, 5, 6, 3, 7, 6]\n\nd = [-1]*(n+1)\nd[0] = 0\n\nfor i in range(n+1):\n    for ai in a:\n        if (i - c[ai]) >= 0:\n            d[i] = max(d[i], d[i-c[ai]]*10 + ai)\n\nprint(d[-1])\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "from bisect import insort_left\nN, M = [int(a) for a in input().split(\" \")]\nctab = {\"1\":2,\"2\":5,\"3\":5,\"4\":4,\"5\":5,\"6\":6,\"7\":3,\"8\":7,\"9\":6}\nA = [(a, ctab[a]) for a in input().split(\" \")]\nprev = [None]*(N+1)\ncurr = [None]*(N+1)\nfor char, cost in A:\n    if not prev[cost] or char>prev[cost]:\n        prev[cost] = char\n\ndef insert(s, char):\n    ls = list(s)[::-1]\n    insort_left(ls, char)\n    return int(\"\".join(ls[::-1]))\n\ntmp = \"\"\nwhile any(prev):\n    for i in range(1, N+1):\n        maxval = -1\n        for char, cost in A:\n            if i-cost>=0 and prev[i-cost]:\n                val = insert(prev[i-cost], char)\n                maxval = val if val > maxval else maxval\n        curr[i] = str(maxval) if maxval > 0 else None\n    if curr[N] is not None:\n        tmp = curr[N]\n    curr, prev = prev, curr\nprint(tmp)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.10136037846909345,
+        "jaccard": 0.4246575342465753,
+        "tsed": 0.33177257525083437,
+        "cged": 0.32840722495894914,
+        "codebleu": 0.0827712217722687
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 9
+    },
+    {
+      "case": "p03992",
+      "src": {
+        "code": "# CODE FESTIVAL 2016 予選 A: A – CODEFESTIVAL 2016\ns = input()\nprint(s[:4] + \" \" + s[4:])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "if __name__ == \"__main__\":\n\tS = \"CODEFESTIVAL\"\n\tprint (S[:4] + \" \" + S[4:])",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.3037643089519314,
+        "jaccard": 0.45454545454545453,
+        "tsed": 0.6941176470588236,
+        "cged": 0.8,
+        "codebleu": 0.4943026888994991
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 0
+    },
+    {
+      "case": "p03992",
+      "src": {
+        "code": "s=list(input())\nans=[\" \" for _ in range(13)]\nfor i in range(4):\n    ans[i]=s[i]\nfor i in range(8):\n    ans[i+5]=s[i+4]\nprint(''.join(ans))\n\n\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "s = list(input())\nK = int(input())\nalphabet = \"abcdefghijklmnopqrstuvwxyz\"\n\n# need = 0\n# for i in range(len(s)):\n#     need += ord(\"z\") - ord(s[i]) + 1\n\nfor i in range(len(s)):\n    if K >= 26 or s[i] >= alphabet[-K]:\n        K -= ord(\"z\") - ord(s[i]) + 1\n        s[i] = \"a\"\n\nif K > 0:\n    K %= 26\n    if (chr(ord(s[-1]) + K) <= \"z\"):\n        s[-1] = chr(ord(s[-1]) + K)\n    else:\n        s[-1] = chr(ord(\"a\") + K)\n\n# if K > 0:\n#     K %= 26\n#     if (ord(s[-1]) + K <= ord(\"z\")):\n#         s[-1] = chr(ord(s[-1]) + K)\n#     else:\n#         s[-1] = chr(ord(\"a\") + K - (ord(\"z\" - ord(s[-1]))))\n\nprint(\"\".join(s))",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.018622353290976355,
+        "jaccard": 0.38636363636363635,
+        "tsed": 0.4289156626506029,
+        "cged": 0.3798219584569733,
+        "codebleu": 0.13885824701014826
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 1
+    },
+    {
+      "case": "p03992",
+      "src": {
+        "code": "string = input()\nprint(string[:4] + \" \" + string[4:])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "s = raw_input()\nprint(s[:4] + \" \" + s[4:])",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.5464463020975288,
+        "jaccard": 0.6923076923076923,
+        "tsed": 1.0,
+        "cged": 1.0,
+        "codebleu": 0.6577992269556472
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 2
+    },
+    {
+      "case": "p03992",
+      "src": {
+        "code": "s = input().strip()\nprint(s[:4]+\" \"+s[4:])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "import sys\n\na = sys.argv[1]\nb = a[:4]\nc = a[4:]\nprint (b+\" \"+c+\"\\n\")",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.1632926025330061,
+        "jaccard": 0.45454545454545453,
+        "tsed": 0.39090909090909065,
+        "cged": 0.647887323943662,
+        "codebleu": 0.0961186425898623
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 3
+    },
+    {
+      "case": "p03992",
+      "src": {
+        "code": "# CODE FESTIVAL 2016 予選 A: A – CODEFESTIVAL 2016\ns = input()\nprint(s[:4] + \" \" + s[4:])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "## this submission is just for checking pypy3 performance\n## the code is borrowed from http://code-festival-2016-quala.contest.atcoder.jp/submissions/899133\n\n\nfrom sys import exit, setrecursionlimit\nfrom functools import reduce\nfrom itertools import *\nfrom collections import defaultdict\n \ndef read():\n  return int(input())\n \ndef reads():\n  return [int(x) for x in input().split()]\n \nsetrecursionlimit(1000000)\n \n(R, C) = reads()\nN = read()\n \nd = defaultdict(list)\nV = set()\n \nfor _ in range(N):\n  (r, c, a) = reads()\n  (r, c) = (r-1, c-1)\n  d[\"R\", r].append(((\"C\", c), a))\n  d[\"C\", c].append(((\"R\", r), a))\n  V.add((\"R\", r))\n  V.add((\"C\", c))\n \ndef walk(v):\n  V.discard(v)\n  for (w, a) in d[v]:\n    wcol = a - col[v]\n    if w in col:\n      if col[w] != wcol:\n        print(\"No\"); exit()\n    else:\n      col[w] = wcol\n      walk(w)\n \nwhile len(V) > 0:\n  v = V.pop()\n  col = dict()\n  col[v] = 0\n  walk(v)\n  rcol = min(a for (v, a) in col.items() if v[0] == \"R\")\n  ccol = min(a for (v, a) in col.items() if v[0] == \"C\")\n  if rcol + ccol < 0:\n    print(\"No\"); exit()\n \nprint(\"Yes\")\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 1.216413663468811e-06,
+        "jaccard": 0.1111111111111111,
+        "tsed": 0.23286118980169485,
+        "cged": 0.06301824212271978,
+        "codebleu": 0.05395502809573935
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 4
+    },
+    {
+      "case": "p03992",
+      "src": {
+        "code": "s=input();print(s[:4],s[4:])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "#!/usr/bin/env python\n# -*- coding: utf-8 -*-\n# D-Grid and Integers\n\nfrom collections import defaultdict\n\ndef ReadInput():\n\treturn [int(i) for i in input().split(\" \")]\n\n(R, C) = ReadInput()\nN = int(input())\nRowIdx = set()\nColIdx = set()\nGrid = defaultdict(list)\nRowGrid = defaultdict(list)\nColGrid = defaultdict(list)\nfor i in range(N):\n\t(r, c, a) = ReadInput()\n\tRowGrid[r].append(c)\n\tColGrid[c].append(r)\n\tGrid[(r, c)] = a\n\tRowIdx.add(r)\n\tColIdx.add(c)\t\n\nfresh = 1\nwhile(fresh == 1):\n\tfresh = 0\n\tfor row in RowIdx:\n\t\tif (len(RowGrid[row]) == 1):\n\t\t\tcontinue\n\t\tTempRow = RowGrid[row].copy()\n\t\tTempColGrid = ColGrid.copy()\n\t\tfor pointer in TempRow:\n\t\t\tTempCol = TempRow.copy()\n\t\t\tTempCol.remove(pointer)\n\t\t\tfor pair in TempCol:\n\t\t\t\tdif = Grid[(row, pointer)] - Grid[(row, pair)]\n\t\t\t\tObjCol = TempColGrid[pointer].copy()\n\t\t\t\tObjCol.remove(row)\n\t\t\t\tfor obj in ObjCol:\n\t\t\t\t\tval = Grid[(obj, pointer)]- dif \n\t\t\t\t\tif (val < 0):\n\t\t\t\t\t\tprint(\"No\")\n\t\t\t\t\t\texit()\n\t\t\t\t\tif ((obj, pair) in Grid):\n\t\t\t\t\t\tif (val != Grid[(obj, pair)]):\n\t\t\t\t\t\t\tprint(\"No\");\n\t\t\t\t\t\t\texit()\n\t\t\t\t\telse:\n\t\t\t\t\t\tGrid[(obj, pair)] = val\n\t\t\t\t\t\tRowGrid[obj].append(pair)\n\t\t\t\t\t\tColGrid[pair].append(obj)\n\t\t\t\t\t\tfresh = 1\nprint(\"Yes\")",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 2.4869386678358393e-09,
+        "jaccard": 0.125,
+        "tsed": 0.22690058479531705,
+        "cged": 0.04823747680890533,
+        "codebleu": 0.0363030303030303
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 5
+    },
+    {
+      "case": "p03992",
+      "src": {
+        "code": "string = input()\nprint(string[:4] + \" \" + string[4:])",
+        "language": "python"
+      },
+      "dst": {
+        "code": "s1 = raw_input()\ns2 = raw_input()\ns2 = s2.split(\" \")\nf = 0\nfor a,b in enumerate(s2):\n    if str(s2[int(b)-1]) == str(a+1):\n        f = f+1\nprint str(f/2)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.004199800824404092,
+        "jaccard": 0.25806451612903225,
+        "tsed": 0.3126760563380284,
+        "cged": 0.0,
+        "codebleu": 0.0774367967373497
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 6
+    },
+    {
+      "case": "p03992",
+      "src": {
+        "code": "def main():\n    s = input().rstrip()\n    print(s[:4] + \" \" + s[4:])\n\nif __name__ == \"__main__\":\n    main()\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "S=input()\nT=S[:4]+\" \"+S[4:]\nptint(T)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.25490974176653125,
+        "jaccard": 0.42857142857142855,
+        "tsed": 0.5822222222222222,
+        "cged": 0.4864864864864865,
+        "codebleu": 0.18790849673202614
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 7
+    },
+    {
+      "case": "p03992",
+      "src": {
+        "code": "s = input()\n\na = s[:4]\nb = s[4:]\nprint(a + ' ' + b)",
+        "language": "python"
+      },
+      "dst": {
+        "code": "s = raw_input()\nprint s[0:4] + \" \" + s[4:]\n",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.24812562525879425,
+        "jaccard": 0.6666666666666666,
+        "tsed": 0.3151515151515151,
+        "cged": 0.0,
+        "codebleu": 0.40743306000457347
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 8
+    },
+    {
+      "case": "p03992",
+      "src": {
+        "code": "#!/usr/bin/env python3\n# -*- coding: utf-8 -*-\nS = input()\nprint(S[:4], S[4:])\n",
+        "language": "python"
+      },
+      "dst": {
+        "code": "s=input\nss=s[0:3]+\" \"+s[4:]\nprint(ss)",
+        "language": "python"
+      },
+      "similarity": {
+        "bleu": 0.08600383785890306,
+        "jaccard": 0.32142857142857145,
+        "tsed": 0.4714285714285714,
+        "cged": 0.5714285714285714,
+        "codebleu": 0.13333333333333333
+      },
+      "sample_type": "positive-negative",
+      "pair_index": 9
+    }
+  ],
+  "total_processed_cases": 10,
+  "total_cases": 10,
+  "total_processed_pairs": 100
+}

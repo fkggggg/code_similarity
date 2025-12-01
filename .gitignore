@@ -2,6 +2,7 @@
 CGED/
 TSED/
 case_results/
+roc_results/
 datasets/
 datasets_old/
 similarity_results/
