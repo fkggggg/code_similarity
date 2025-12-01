@@ -13,6 +13,9 @@ from codebleu import calc_codebleu
 import concurrent.futures
 from functools import partial
 import multiprocessing
+import time
+from multiprocessing import Manager
+import signal
 
 # 从参考文件复制的分词和相似度计算函数
 def tokenize_code(code_string):
@@ -130,66 +133,6 @@ def select_code_pairs(code_list, max_pairs=10, seed=42):
     selected_pairs = random.sample(all_pairs, max_pairs)
     return selected_pairs
 
-def calculate_all_similarities(code1, code2, language='python'):
-    """
-    计算所有相似度方法的分数
-    
-    参数:
-        code1 (str): 第一段代码
-        code2 (str): 第二段代码
-        language (str): 代码语言
-    
-    返回:
-        dict: 包含所有相似度分数的字典
-    """
-    # 计算BLEU分数
-    bleu_score = bleu(code1, code2)
-    
-    # 计算Jaccard相似度
-    jaccard_score = jaccard(code1, code2)
-    
-    # 计算TSED分数
-    try:
-        tsed_score = TSED(language, code1, code2, 1.0, 0.8, 1.0)
-    except Exception as e:
-        print(f"TSED计算出错: {e}")
-        tsed_score = 0.0
-    
-    # 计算CGED分数
-    try:
-        cged_score = CGED(
-            code_src_dst_list=[(code1, code2)],
-            language_src_dst_list=[(language, language)],
-            src_update_long_term_cache=True,
-            dst_update_long_term_cache=False,
-            pdg_parallelism = 10,
-            nx_parallelism=60,
-            nx_budget=20,
-            verbose_level=0,   # set to 2 when debugging
-        )
-        # 获取返回的第一个相似度值
-        if cged_score and isinstance(cged_score, list):
-            cged_score = cged_score[0]
-    except Exception as e:
-        print(f"CGED计算出错: {e}")
-        cged_score = 0.0
-    
-    # 计算CodeBLEU分数
-    try:
-        codebleu_result = calc_codebleu([code2], [code1], lang=language)
-        codebleu_score = codebleu_result['codebleu']
-    except Exception as e:
-        print(f"CodeBLEU计算出错: {e}")
-        codebleu_score = 0.0
-    
-    return {
-        'bleu': bleu_score,
-        'jaccard': jaccard_score,
-        'tsed': tsed_score,
-        'cged': cged_score,
-        'codebleu': codebleu_score
-    }
-
 def _calculate_tsed_single(args):
     """
     计算单个TSED相似度的辅助函数
@@ -222,41 +165,52 @@ def _calculate_codebleu_single(args):
     """
     index, language, code1, code2 = args
     try:
-        # 重新导入模块以确保在子进程中可用
-        from codebleu import calc_codebleu
         codebleu_result = calc_codebleu([code2], [code1], lang=language)
         return index, codebleu_result['codebleu']
     except Exception as e:
         print(f"CodeBLEU计算出错（对{index}）: {e}")
         return index, 0.0
 
-def batch_calculate_similarities(code_pairs, language='python', num_processes=40, cged_params=None):
+def _calculate_single_metric_wrapper(index, language, code1, code2, metric_name, shared_results):
+    try:
+        if metric_name == 'bleu':
+            score = bleu(code1, code2)
+        elif metric_name == 'jaccard':
+            score = jaccard(code1, code2)
+        elif metric_name == 'tsed':
+            # 假设传递元组，并取score
+            result = _calculate_tsed_single((index, language, code1, code2))
+            score = result[1] if isinstance(result, tuple) else result
+        elif metric_name == 'codebleu':
+            # 同上
+            result = _calculate_codebleu_single((index, language, code1, code2))
+            score = result[1] if isinstance(result, tuple) else result
+        else:
+            raise ValueError(f"未知指标: {metric_name}")
+        
+        shared_results[index][metric_name] = score
+    except Exception as e:
+        print(f"代码对 {index} 的 {metric_name} 计算出错: {e}")
+        shared_results[index][metric_name] = 0.0
+
+def batch_calculate_similarities(case_id, code_pairs, language='python', num_processes=40, cged_params=None, timeout_seconds=20, timeout_output_file=None):
     """
-    批量计算代码对的相似度，利用CGED的批处理能力，并行化TSED和CodeBLEU计算
-    使用进程池替代线程池以获得更好的性能，特别是在CPU密集型任务上
+    批量计算代码对的相似度，利用CGED的批处理能力，并行化其他指标计算
     
     参数:
+        case_id (str): 用于标识当前case的ID
         code_pairs (list): 代码对列表，每个元素是(code1, code2)元组
         language (str): 代码语言
-        num_processes (int): 并行处理进程数
+        num_processes (int): 并行处理进程数（实际并发受len(code_pairs)限制）
         cged_params (dict): CGED参数配置
+        timeout_seconds (int): 每个子进程的最大执行时间（秒）
+        timeout_output_file (str, optional): 超时案例的输出JSON文件路径，若提供则会保存超时案例信息
     
     返回:
         list: 包含每个代码对相似度字典的列表
     """
-    results = []
-    
-    # 计算BLEU和Jaccard相似度（这些需要逐个计算）
-    for code1, code2 in code_pairs:
-        bleu_score = bleu(code1, code2)
-        jaccard_score = jaccard(code1, code2)
-        results.append({
-            'bleu': bleu_score,
-            'jaccard': jaccard_score,
-            'tsed': 0.0,  # 将在后面填充
-            'cged': 0.0,  # 将在后面填充
-            'codebleu': 0.0  # 将在后面填充
-        })
+    manager = Manager()
+    shared_results = manager.list([manager.dict() for _ in code_pairs])  # Shared list of dicts
     
     # 默认CGED参数
     default_cged_params = {
@@ -268,53 +222,154 @@ def batch_calculate_similarities(code_pairs, language='python', num_processes=40
         'verbose_level': 0
     }
     
-    # 如果提供了自定义参数，则合并默认参数和自定义参数
+    # 如果提供了自定义参数，则合并
     if cged_params:
         default_cged_params.update(cged_params)
     
     # 批量计算CGED相似度
     try:
-        cged_scores = CGED(
-            code_src_dst_list=code_pairs,  # 直接传递所有代码对
-            language_src_dst_list=[(language, language)] * len(code_pairs),
-            src_update_long_term_cache=default_cged_params['src_update_long_term_cache'],
-            dst_update_long_term_cache=default_cged_params['dst_update_long_term_cache'],
-            pdg_parallelism=default_cged_params['pdg_parallelism'],
-            nx_parallelism=default_cged_params['nx_parallelism'],
-            nx_budget=default_cged_params['nx_budget'],
-            verbose_level=default_cged_params['verbose_level'],
-        )
+        # cged_scores = CGED(
+        #     code_src_dst_list=code_pairs,  # 直接传递所有代码对
+        #     language_src_dst_list=[(language, language)] * len(code_pairs),
+        #     src_update_long_term_cache=default_cged_params['src_update_long_term_cache'],
+        #     dst_update_long_term_cache=default_cged_params['dst_update_long_term_cache'],
+        #     pdg_parallelism=default_cged_params['pdg_parallelism'],
+        #     nx_parallelism=default_cged_params['nx_parallelism'],
+        #     nx_budget=default_cged_params['nx_budget'],
+        #     verbose_level=default_cged_params['verbose_level'],
+        # )
         
         # 填充CGED分数
         for i, score in enumerate(cged_scores):
-            if i < len(results):
-                results[i]['cged'] = score
+            if i < len(shared_results):
+                shared_results[i]['cged'] = score
     except Exception as e:
         print(f"批量CGED计算出错: {e}")
+        # 可选：为所有results设置默认cged=0.0
+        for res in shared_results:
+            res['cged'] = 0.0
     
-    # 并行计算TSED相似度
-    tsed_args = [(i, language, code1, code2) for i, (code1, code2) in enumerate(code_pairs)]
+    # 定义所有非CGED指标
+    metrics = ['bleu', 'jaccard', 'tsed', 'codebleu']
     
-    with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as executor:
-        tsed_futures = [executor.submit(_calculate_tsed_single, args) for args in tsed_args]
-        for future in concurrent.futures.as_completed(tsed_futures):
-            index, tsed_score = future.result()
-            if index < len(results):
-                results[index]['tsed'] = tsed_score
+    # 准备任务列表：每个代码对的每个指标一个任务
+    tasks = []
+    for i, pair in enumerate(code_pairs):
+        code1, code2 = pair
+        for metric_name in metrics:
+            tasks.append((i, language, code1, code2, metric_name))
     
-    # 并行计算CodeBLEU相似度
-    codebleu_args = [(i, language, code1, code2) for i, (code1, code2) in enumerate(code_pairs)]
+    # 存储超时的案例
+    timeout_results = []
     
-    with concurrent.futures.ProcessPoolExecutor(max_workers=num_processes) as executor:
-        codebleu_futures = [executor.submit(_calculate_codebleu_single, args) for args in codebleu_args]
-        for future in concurrent.futures.as_completed(codebleu_futures):
-            index, codebleu_score = future.result()
-            if index < len(results):
-                results[index]['codebleu'] = codebleu_score
+    active_processes = []
+    process_start_times = {}  # 记录每个进程的启动时间
     
+    for task in tasks:
+        index, lang, c1, c2, metric_name = task
+        p = multiprocessing.Process(target=_calculate_single_metric_wrapper, args=(index, lang, c1, c2, metric_name, shared_results))
+        p.start()
+        start_time = time.time()  # 记录每个进程的启动时间
+        process_start_times[p.pid] = start_time
+        active_processes.append((index, metric_name, p))
+        
+        # 控制并发数: 如果活跃进程超过num_processes, 等待一些完成
+        while len([p for _, _, p in active_processes if p.is_alive()]) >= num_processes:
+            for idx, mname, proc in active_processes[:]:
+                proc.join(0.1)
+                if not proc.is_alive():
+                    active_processes.remove((idx, mname, proc))
+    
+    # 现在等待所有进程，应用超时
+    # 为每个进程分别检查超时
+    while active_processes:
+        for index, metric_name, p in active_processes[:]:
+            # 检查进程是否超时
+            if p.pid in process_start_times:
+                elapsed_time = time.time() - process_start_times[p.pid]
+            else:
+                elapsed_time = 0  # 如果没有记录到启动时间，默认不超时
+            
+            # 如果进程已完成或超时，处理它
+            if not p.is_alive() or elapsed_time > timeout_seconds:
+                if p.is_alive():
+                    print(f"警告：代码对 {index} 的 {metric_name} 计算超时（超过 {timeout_seconds} 秒），已终止该进程")
+                    try:
+                        os.kill(p.pid, signal.SIGTERM)
+                    except OSError as e:
+                        print(f"SIGTERM出错: {e}")
+                    time.sleep(1)
+                    if p.is_alive():
+                        try:
+                            os.kill(p.pid, signal.SIGKILL)
+                        except OSError as e:
+                            print(f"SIGKILL出错: {e}")
+                    # 安全解包code_pairs[index]
+                    code1, code2 = '', ''
+                    if 0 <= index < len(code_pairs):
+                        pair = code_pairs[index]
+                        if isinstance(pair, (tuple, list)) and len(pair) >= 2:
+                            code1, code2 = pair[0], pair[1]
+                    timeout_results.append({
+                        'case_id': case_id,
+                        'index': index,
+                        'metric': metric_name,
+                        'code1': code1,
+                        'code2': code2,
+                        'error': 'timeout',
+                        'timeout_seconds': timeout_seconds
+                    })
+                    # 设置默认值
+                    shared_results[index][metric_name] = 0.0
+                # 移除已完成或超时的进程
+                active_processes.remove((index, metric_name, p))
+                if p.is_alive():  # 确保进程已被终止后再调用join
+                    p.join()  # 清理
+            else:
+                # 如果进程还在运行且未超时，短暂等待后继续检查
+                p.join(0.1)
+        
+        # 如果还有活跃进程，短暂休眠以避免过度占用CPU
+        if active_processes:
+            time.sleep(0.1)
+    
+    # 如果有超时案例，保存到单独的JSON文件中
+    if timeout_results:
+        if timeout_output_file:
+            timeout_filename = timeout_output_file
+        else:
+            timeout_filename = f"timeout_results_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        try:
+            # 如果文件已存在，读取原有内容并追加新案例
+            if os.path.exists(timeout_filename):
+                try:
+                    with open(timeout_filename, 'r', encoding='utf-8') as f:
+                        existing_data = json.load(f)
+                        existing_timeout_cases = existing_data.get('timeout_cases', [])
+                        # 合并所有超时案例
+                        combined_cases = existing_timeout_cases + timeout_results
+                        timeout_results = combined_cases
+                except Exception as e:
+                    print(f"读取现有超时文件时出错: {e}")
+                    # 如果读取出错，继续使用当前的timeout_results
+            
+            # 写入合并后的内容
+            with open(timeout_filename, 'w', encoding='utf-8') as f:
+                json.dump({
+                    'timeout_cases': timeout_results,
+                    'total_timeout_cases': len(timeout_results),
+                    'timestamp': datetime.datetime.now().isoformat()
+                }, f, ensure_ascii=False, indent=2)
+            print(f"已将 {len(timeout_results)} 个超时案例保存到 {timeout_filename}")
+        except Exception as e:
+            print(f"保存超时案例到文件时出错: {e}")
+    
+    # 转换回普通list(dict) 以返回
+    results = [dict(d) for d in shared_results]
     return results
 
-def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output_json=None, num_processes=40):
+def get_pos_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, output_json=None, num_processes=40, timeout_seconds=20, timeout_output_file=None):
     """
     处理数据集，计算每个case中correct_submission之间的相似度均值，并支持生成JSON输出
     
@@ -323,7 +378,10 @@ def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output
         num_pairs_per_case (int): 每个case要抽取的样本对数量
         seed (int): 随机种子，用于确保结果可复现
         output_json (str, optional): 输出JSON文件路径
-    
+        num_processes (int): 并行处理进程数（实际并发受len(code_pairs)限制）
+        timeout_seconds (int): 每个子进程的最大执行时间（秒）
+        timeout_output_file (str, optional): 超时案例的输出JSON文件路径
+
     返回:
         dict: 包含整体均值结果和生成的JSON数据
     """
@@ -424,7 +482,7 @@ def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output
                 try:
                     # 获取CGED参数
                     cged_params = getattr(batch_calculate_similarities, 'cged_params', None)
-                    all_similarities = batch_calculate_similarities(pairs, language, num_processes=num_processes, cged_params=cged_params)
+                    all_similarities = batch_calculate_similarities(case_id, pairs, language, num_processes=num_processes, cged_params=cged_params, timeout_seconds=timeout_seconds, timeout_output_file=timeout_output_file)
                     
                     # 累加相似度并构建JSON结果
                     for i, (pair, similarities) in enumerate(zip(pairs, all_similarities)):
@@ -567,7 +625,7 @@ def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output
         return None
 
 
-def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, output_json=None, num_processes=40):
+def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, output_json=None, num_processes=40, timeout_seconds=20, timeout_output_file=None):
     """
     处理数据集，每个case抽取指定数量的"一正一负"样本对计算相似度
     每个样本对由一个正样本（同一case内的代码）和一个负样本（同一case的incorrect_submission）组成
@@ -578,6 +636,9 @@ def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, 
         num_pairs_per_case (int): 每个case要抽取的"一正一负"样本对数量
         seed (int): 随机种子，用于确保结果可复现
         output_json (str, optional): 输出JSON文件路径，若提供则会在每个case完成后写入结果
+        num_processes (int): 并行处理的最大进程数
+        timeout_seconds (int): 每个子进程的最大执行时间（秒）
+        timeout_output_file (str, optional): 超时案例的输出JSON文件路径
     
     返回:
         dict: 包含相似度统计结果和生成的JSON数据
@@ -641,17 +702,15 @@ def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, 
         
         # 处理每个case
         for case_idx, (case_id, code_list) in enumerate(tqdm(all_case_codes, desc="处理所有case")):
-            print(f"处理case {case_id}: 有 {len(code_list)} 个正确提交")
             
             # 用于当前case的结果列表
             current_case_results = []
             
             try:
-                # 正样本：从同一case中随机选择代码（可以重复）
+                # 正样本：从同一case中随机选择代码
                 positive_samples = []
-                random.seed(seed + case_idx)  # 为每个case设置不同但固定的种子
                 
-                # 生成正样本（从同一case中随机选择，可重复）
+                # 生成正样本
                 for _ in range(num_pairs_per_case):
                     positive_samples.append(random.choice(code_list))
                 
@@ -662,7 +721,7 @@ def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, 
                 negative_pool = [sub.get('code', '') for sub in incorrect_submissions if 'code' in sub]
                 negative_pool = [code for code in negative_pool if code.strip()]
                 
-                # 负样本：从当前case的incorrect_submission中随机选择代码（可以重复）
+                # 负样本：从当前case的incorrect_submission中随机选择代码
                 negative_samples = []
                 if negative_pool:  # 检查negative_pool是否为空
                     for _ in range(num_pairs_per_case):
@@ -698,21 +757,83 @@ def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, 
                 
                 # 创建"一正一负"的样本对
                 pos_neg_pairs = []
-                for i in range(min(len(positive_samples), len(negative_samples))):
-                    pos_neg_pairs.append((positive_samples[i], negative_samples[i]))
+                valid_positive_samples = [code for code in positive_samples if code and isinstance(code, str)]
+                valid_negative_samples = [code for code in negative_samples if code and isinstance(code, str)]
                 
-                print(f"  生成 {len(pos_neg_pairs)} 个'一正一负'样本对")
+                print(f"  有效正样本数: {len(valid_positive_samples)}, 有效负样本数: {len(valid_negative_samples)}")
                 
-                # 如果没有有效的样本对，跳过此case
+                # 检查是否有足够的正负样本
+                if len(valid_positive_samples) == 0 or len(valid_negative_samples) == 0:
+                    print(f"  错误：没有足够的有效正负样本生成配对")
+                    
+                    # 记录错误结果
+                    error_item = {
+                        "case": case_id,
+                        "error": "No valid positive/negative samples",
+                        "error_type": "ValueError",
+                        "positive_samples_count": len(valid_positive_samples),
+                        "negative_samples_count": len(valid_negative_samples)
+                    }
+                    json_results.append(error_item)
+                    current_case_results.append(error_item)
+                    
+                    # 写入错误信息
+                    if output_json and output_file_initialized and current_case_results:
+                        try:
+                            # 读取现有文件
+                            with open(output_json, 'r', encoding='utf-8') as f:
+                                output_data = json.load(f)
+                            
+                            # 追加错误信息
+                            output_data['results'].extend(current_case_results)
+                            
+                            # 写回文件
+                            with open(output_json, 'w', encoding='utf-8') as f:
+                                json.dump(output_data, f, ensure_ascii=False, indent=2)
+                            print(f"  已将case {case_id} 的错误信息写入输出文件")
+                        except Exception as e:
+                            print(f"  写入case {case_id} 的错误信息到输出文件时出错: {e}")
+                    continue
+                
+                pos_neg_pairs = []
+                
+                # 从正负样本中各抽取min(len(samples), num_pairs_per_case)个样本来组合
+                num_pos_to_sample = min(len(valid_positive_samples), num_pairs_per_case)
+                num_neg_to_sample = min(len(valid_negative_samples), num_pairs_per_case)
+
+                sampled_positives = random.sample(valid_positive_samples, num_pos_to_sample)
+                sampled_negatives = random.sample(valid_negative_samples, num_neg_to_sample)
+                
+                # 生成所有可能的组合
+                all_pairs = []
+                for pos_code in sampled_positives:
+                    for neg_code in sampled_negatives:
+                        all_pairs.append((pos_code, neg_code))
+                
+                # 去重
+                unique_pairs = []
+                for i, pair in enumerate(all_pairs):
+                    is_duplicate = False
+                    for j in range(i):
+                        if are_pairs_duplicate(pair, all_pairs[j]):
+                            is_duplicate = True
+                            break
+                    if not is_duplicate:
+                        unique_pairs.append(pair)
+                
+                if len(unique_pairs) >= num_pairs_per_case:
+                    pos_neg_pairs = random.sample(unique_pairs, num_pairs_per_case)
+                else:
+                    pos_neg_pairs = unique_pairs
+                    print(f"  警告：唯一样本对数量({len(unique_pairs)})少于请求的数量({num_pairs_per_case})")
                 if not pos_neg_pairs:
                     print(f"  警告：没有找到有效的'一正一负'样本对，跳过此case")
-                    
                     # 记录空结果
                     empty_item = {
                         "case": case_id,
                         "status": "no_valid_pairs",
                         "positive_sample_count": len(positive_samples),
-                        "negative_sample_count": len(negative_samples)
+                        "negative_sample_count": len(negative_samples),
                     }
                     json_results.append(empty_item)
                     current_case_results.append(empty_item)
@@ -734,7 +855,7 @@ def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, 
                 # 计算样本对相似度
                 # 获取CGED参数
                 cged_params = getattr(batch_calculate_similarities, 'cged_params', None)
-                similarity_results = batch_calculate_similarities(pos_neg_pairs, language, cged_params=cged_params)
+                similarity_results = batch_calculate_similarities(case_id, pos_neg_pairs, language, cged_params=cged_params, timeout_seconds=timeout_seconds, timeout_output_file=timeout_output_file)
                 
                 # 构建当前case的JSON结果
                 for i, ((positive_code, negative_code), similarities) in enumerate(zip(pos_neg_pairs, similarity_results)):
@@ -894,11 +1015,11 @@ def main():
     output_dir = f"/data/lyy/code_similarity/similarity_results/{timestamp}"
     os.makedirs(output_dir, exist_ok=True)
     
-    json_file_path = "/data/lyy/code_similarity/datasets_old/dataset_test_py3_subset.json"
+    json_file_path = "/data/lyy/code_similarity/datasets_old/dataset_test_cpp_subset.json"
     print(f"开始处理文件: {json_file_path}")
     # 每个case要抽取的样本对数量
     num_pairs_per_case = 10
-    # 最大进程数，默认使用80%的CPU核心数
+    # 最大进程数
     num_processes = int(max(multiprocessing.cpu_count() * 0.8, 40))
     # CGED参数
     cged_params = {
@@ -912,14 +1033,19 @@ def main():
     
     batch_calculate_similarities.cged_params = cged_params
     
+    # 超时控制参数（秒）
+    timeout_seconds = 20
+    
     # 指定输出JSON文件路径
     output_json_path = f"{output_dir}/pos_pairs_similarity_results.json"
+    timeout_output_file = f"{output_dir}/timeout_cases_pos.json"
     
     # 运行正样本对相似度计算
-    results = get_pos_pairs_similarity(json_file_path, num_pairs_per_case, random_seed, output_json=output_json_path, num_processes=num_processes)
+    results = get_pos_pairs_similarity(json_file_path, num_pairs_per_case, random_seed, output_json=output_json_path, num_processes=num_processes, timeout_seconds=timeout_seconds, timeout_output_file=timeout_output_file)
 
     output_json_path2 = f"{output_dir}/pos_neg_pairs_similarity_results.json"
-    results = get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case, random_seed, output_json=output_json_path2, num_processes=num_processes)
+    timeout_output_file2 = f"{output_dir}/timeout_cases_pos_neg.json"
+    results = get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case, random_seed, output_json=output_json_path2, num_processes=num_processes, timeout_seconds=timeout_seconds, timeout_output_file=timeout_output_file2)
     
     if results:
         print("\n相似度计算完成！")

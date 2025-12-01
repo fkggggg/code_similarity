@@ -288,7 +288,7 @@ def main():
     # 保存分数
     save_auc_scores(auc_scores, os.path.join(args.output_dir, args.score_file))
     
-    print(f"\n✅ 所有结果已保存至: {timestamp_output_dir}")
+    print(f"\n所有结果已保存至: {timestamp_output_dir}")
 
 if __name__ == '__main__':
     main()
