@@ -334,10 +334,8 @@ def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output
         
         # 获取语言信息
         language = data.get('language', 'python')
-        # 如果是py3则映射为python
         if language == 'py3':
             language = 'python'
-        # 如果是cpp则映射为c++
         elif language == 'cpp':
             language = 'cpp'
         
@@ -569,7 +567,7 @@ def get_pos_pairs_similarity(json_file_path, num_pairs_per_case, seed=42, output
         return None
 
 
-def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, output_json=None):
+def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, output_json=None, num_processes=40):
     """
     处理数据集，每个case抽取指定数量的"一正一负"样本对计算相似度
     每个样本对由一个正样本（同一case内的代码）和一个负样本（同一case的incorrect_submission）组成
@@ -591,12 +589,10 @@ def get_pos_neg_pairs_similarity(json_file_path, num_pairs_per_case=5, seed=42, 
         
         # 获取语言信息
         language = data.get('language', 'python')
-        # 如果是py3则映射为python
         if language == 'py3':
             language = 'python'
-        # 如果是cpp则映射为c++
         elif language == 'cpp':
-            language = 'c++'
+            language = 'cpp'
         
         cases = data.get('cases', [])
         print(f"共找到 {len(cases)} 个case")
